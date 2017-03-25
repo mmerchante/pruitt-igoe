@@ -1,7 +1,9 @@
-#include "GLRenderer.h"
-#include <SFML\OpenGL.hpp>
-//#include <gl\glew.h>
 #define GLEW_STATIC
+#include "GLRenderer.h"
+
+#include <gl\glew.h>
+#include <SFML\OpenGL.hpp>
+#include <iostream>
 
 GLRenderer::GLRenderer() : Renderer()
 {
@@ -19,6 +21,13 @@ void GLRenderer::Initialize()
 	glClearDepth(1.f);
 	glClearColor(1.f, 0.f, 0.f, 0.f);
 
+	GLenum err = glewInit();
+
+	if (err != GLEW_OK) {
+		std::cout << "glewInit failed: " << glewGetErrorString(err) << std::endl;
+		exit(1);
+	}
+
 	glEnable(GL_TEXTURE_2D);
 }
 
@@ -32,7 +41,7 @@ void GLRenderer::Render()
 			if (event.type == sf::Event::Closed)
 				window->close();
 		}
-
+		
 		// Now render...
 		glClear(GL_COLOR_BUFFER_BIT);
 		window->display();
