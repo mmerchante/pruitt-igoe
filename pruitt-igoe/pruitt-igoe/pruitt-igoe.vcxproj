@@ -74,11 +74,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;$(MSBuildProjectDirectory)\..\..\dependencies\glm-0.9.8.4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\lib\Release\Win32;$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -86,54 +86,75 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;$(MSBuildProjectDirectory)\..\..\dependencies\glm-0.9.8.4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\lib\Release\Win32;$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;$(MSBuildProjectDirectory)\..\..\dependencies\glm-0.9.8.4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\lib\Release\Win32;$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\include;$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\include;$(MSBuildProjectDirectory)\..\..\dependencies\glm-0.9.8.4;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(MSBuildProjectDirectory)\..\..\dependencies\glew-2.0.0\lib\Release\Win32;$(MSBuildProjectDirectory)\..\..\dependencies\SFML-2.4.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;opengl32.lib;glu32.lib;sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="core\assets\asset.cpp" />
+    <ClCompile Include="core\assets\assetdatabase.cpp" />
+    <ClCompile Include="core\assets\mesh.cpp" />
+    <ClCompile Include="core\assets\meshfactory.cpp" />
+    <ClCompile Include="core\assets\rendertargettexture.cpp" />
+    <ClCompile Include="core\assets\shader.cpp" />
+    <ClCompile Include="core\assets\texture.cpp" />
+    <ClCompile Include="core\material.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="renderer\GLRenderer.cpp" />
     <ClCompile Include="renderer\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
+    <ClInclude Include="core\assets\asset.h" />
+    <ClInclude Include="core\assets\assetdatabase.h" />
+    <ClInclude Include="core\assets\mesh.h" />
+    <ClInclude Include="core\assets\meshfactory.h" />
+    <ClInclude Include="core\assets\rendertargettexture.h" />
+    <ClInclude Include="core\assets\shader.h" />
+    <ClInclude Include="core\assets\texture.h" />
+    <ClInclude Include="core\material.h" />
     <ClInclude Include="renderer\GLRenderer.h" />
     <ClInclude Include="renderer\Renderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="test.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

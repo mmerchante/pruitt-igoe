@@ -1,8 +1,5 @@
-#define GLEW_STATIC
+#include "../common.h"
 #include "GLRenderer.h"
-
-#include <gl\glew.h>
-#include <SFML\OpenGL.hpp>
 #include <iostream>
 
 GLRenderer::GLRenderer() : Renderer()
