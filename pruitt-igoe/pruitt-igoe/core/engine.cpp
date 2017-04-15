@@ -1,5 +1,6 @@
 #include "../common.h"
 #include "engine.h"
+#include "input.h"
 #include "gameobject.h"
 #include "components/camera.h"
 #include "components/renderer.h"
@@ -10,7 +11,7 @@
 Engine * Engine::instance = nullptr;
 
 Engine::Engine() : gameObjects(), cameras(), gameObjectsToAdd(),
-    gameObjectsToDelete(), log(new ConcurrentLog<MultiLog>(new MultiLog())), time(0.f), deltaTime(0.f)
+    gameObjectsToDelete(), input(new Input()), log(new ConcurrentLog<MultiLog>(new MultiLog())), time(0.f), deltaTime(0.f)
 {
     this->log->GetInternalLogger()->AddLogger(new Log(&std::cout));
 }
@@ -219,6 +220,8 @@ void Engine::Start()
 
 			if (event.type == sf::Event::Closed)
 				window->close();
+
+			this->input->HandleEvent(&event);
 		}
 		
 		this->Update(delta);
@@ -234,6 +237,8 @@ void Engine::OnOpenGLContextChanged()
         (*c)->UpdateScreenSize();
 
     uiCamera->UpdateScreenSize();
+
+	LogInfo("Window resized");
 }
 
 void Engine::Test()
@@ -271,6 +276,11 @@ void Engine::Test()
 //    this->Update(1.0/60.0);
 //    assert(this->gameObjects.size() == 0);
 //    assert(this->cameras.size() == 0);
+}
+
+Input * Engine::GetInput()
+{
+	return input;
 }
 
 void Engine::AddLogger(Log *logger)

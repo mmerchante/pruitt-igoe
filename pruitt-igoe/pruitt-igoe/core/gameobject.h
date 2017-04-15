@@ -3,12 +3,14 @@
 
 #include "../common.h"
 #include "engine.h"
+#include "input.h"
 #include "component.h"
 #include "transform.h"
 #include <vector>
 #include <unordered_map>
 #include <typeindex>
 #include <iostream>
+
 
 typedef std::unordered_map<std::type_index, std::vector<Component*>>::iterator ComponentEntryIterator;
 
@@ -34,12 +36,19 @@ public:
     template <class T>
     T* AddComponent()
     {
-        T * t = new T();
-        t->SetParentGameObject(this);
-        components[typeid(T)].push_back(t);
-        componentsToStart.push_back(t);
-        t->Awake();
-        return t;
+		T * t = new T();
+		t->SetParentGameObject(this);
+
+		// If the new component requires input, register it
+		InputListener * listener = dynamic_cast<InputListener*>(t);
+
+		if (listener != nullptr)
+			Engine::GetInstance()->GetInput()->RegisterListener(listener);
+
+		components[typeid(T)].push_back(t);
+		componentsToStart.push_back(t);
+		t->Awake();
+		return t;
     }
 
     // Similar to AddComponent, this method expects the type to match,

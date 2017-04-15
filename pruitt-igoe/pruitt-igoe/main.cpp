@@ -2,6 +2,7 @@
 
 #include "core\assets\assetdatabase.h"
 #include "core\assets\texture.h"
+#include "core\assets\shader.h"
 #include "core\engine.h"
 #include "core\material.h"
 #include "core\gameobject.h"
@@ -10,6 +11,26 @@
 #include "core\assets\meshfactory.h"
 
 #include <iostream>
+
+
+class ShaderReloader : public Component, public InputListener
+{
+public:
+
+	Material * material;
+
+	virtual void OnKeyPressEvent(sf::Event::KeyEvent * e)
+	{
+		if (e->code == sf::Keyboard::Key::R)
+		{
+			if (material != nullptr)
+			{
+				material->Reload();
+				Engine::LogInfo("Reloading shader!");
+			}
+		}
+	}
+};
 
 int main()
 {
@@ -29,6 +50,10 @@ int main()
 	material->SetFeature(GL_DEPTH_TEST, false);
 
 	GameObject * quadGO = GameObject::Instantiate("quad");
+
+	ShaderReloader * reloader = quadGO->AddComponent<ShaderReloader>();
+	reloader->material = material;
+
 	MeshRenderer * r = quadGO->AddComponent<MeshRenderer>();
 	r->SetMesh(MeshFactory::BuildQuad(true));
 	r->SetMaterial(material);

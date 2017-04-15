@@ -16,6 +16,9 @@ public:
 	void LoadFromFilename(std::string filename);
 	std::string GetName();
 
+	void Destroy();
+
+	void Reload();
     void Upload();
     void Bind();
     void Render(Mesh * mesh, GLenum drawMode);
@@ -39,8 +42,6 @@ private:
 	std::string vertexFilename;
 	std::string fragmentFilename;
 
-	GLuint vertShader;
-	GLuint fragShader;
 	GLuint prog;
 
 	int attrPos;

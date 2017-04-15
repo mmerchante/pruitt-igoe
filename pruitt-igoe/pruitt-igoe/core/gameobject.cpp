@@ -1,6 +1,7 @@
 #include "gameobject.h"
 #include "engine.h"
 #include "component.h"
+#include "input.h"
 #include <iostream>
 
 GameObject::GameObject(const std::string& name) : name(name), components(), transform(this, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f)), isDestroyed(false), enabled(true)
@@ -17,6 +18,13 @@ GameObject::~GameObject()
         for(unsigned int i = 0; i < list.size(); i++)
         {
             Component * c = list[i];
+
+			// If the new component was registered, deregister it
+			InputListener * listener = dynamic_cast<InputListener*>(c);
+
+			if (listener != nullptr)
+				Engine::GetInstance()->GetInput()->DeregisterListener(listener);
+
             delete c;
         }
     }

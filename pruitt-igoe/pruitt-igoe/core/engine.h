@@ -11,6 +11,7 @@ class Camera;
 class Renderer;
 class UIRenderer;
 class UICamera;
+class Input;
 
 typedef std::vector<GameObject*>::iterator GameObjectIterator;
 typedef std::vector<Camera*>::iterator CameraIterator;
@@ -26,6 +27,7 @@ public:
     void Render();
 	void Start();
     void Test();
+	Input * GetInput();
 
     void OnOpenGLContextChanged();
     void AddLogger(Log * logger);
@@ -56,6 +58,7 @@ private:
 	Engine();
 
 	static Engine * instance;
+	Input * input;
 	sf::Window * window;
 	float time;
 	float deltaTime;

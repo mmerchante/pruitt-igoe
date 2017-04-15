@@ -140,6 +140,7 @@
     <ClCompile Include="core\components\renderer.cpp" />
     <ClCompile Include="core\engine.cpp" />
     <ClCompile Include="core\gameobject.cpp" />
+    <ClCompile Include="core\input.cpp" />
     <ClCompile Include="core\log.cpp" />
     <ClCompile Include="core\material.cpp" />
     <ClCompile Include="core\transform.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="core\components\renderer.h" />
     <ClInclude Include="core\engine.h" />
     <ClInclude Include="core\gameobject.h" />
+    <ClInclude Include="core\input.h" />
     <ClInclude Include="core\log.h" />
     <ClInclude Include="core\material.h" />
     <ClInclude Include="core\transform.h" />

@@ -8,8 +8,7 @@
 const std::string SHADER_BASE_DIRECTORY = "./glsl/";
 
 Shader::Shader() : Asset(), shaderName(""),
-    vertShader(-1), fragShader(-1), prog(-1),
-    attrPos(-1), attrNor(-1), attrCol(-1), attrUV(-1), loaded(false)
+    prog(-1), attrPos(-1), attrNor(-1), attrCol(-1), attrUV(-1), loaded(false)
 {
     vertexFilename = "";
     fragmentFilename = "";
@@ -17,6 +16,7 @@ Shader::Shader() : Asset(), shaderName(""),
 
 Shader::~Shader()
 {
+	Destroy();
 }
 
 void Shader::LoadFromFilename(std::string filename)
@@ -26,6 +26,73 @@ void Shader::LoadFromFilename(std::string filename)
     fragmentFilename = SHADER_BASE_DIRECTORY + shaderName + ".frag.glsl";
 }
 
+void Shader::Destroy()
+{
+	if (prog != -1)
+		glDeleteProgram(prog);
+}
+
+void Shader::Reload()
+{
+	// It hasn't been loaded yet...
+	if (!loaded)
+		return;
+
+	Engine::LogInfo("Reloading " + vertexFilename);
+	Engine::LogInfo("Reloading " + fragmentFilename);
+
+	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	std::string vertexSource = ReadFile(vertexFilename);
+	std::string fragmentSource = ReadFile(fragmentFilename);
+	
+	const char * vertSource = vertexSource.c_str();
+	const char * fragSource = fragmentSource.c_str();
+
+	// Send the shader text to OpenGL and store it in the shaders specified by the handles vertShader and fragShader
+	glShaderSource(vertShader, 1, &vertSource, 0);
+	glShaderSource(fragShader, 1, &fragSource, 0);
+
+	// Tell OpenGL to compile the shader text stored above
+	glCompileShader(vertShader);
+	glCompileShader(fragShader);
+
+	// Check if everything compiled OK
+	GLint compiled;
+
+	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &compiled);
+	if (!compiled)
+		PrintShaderInfoLog(vertShader);
+
+	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &compiled);
+	if (!compiled)
+		PrintShaderInfoLog(fragShader);
+
+	// Tell prog that it manages these particular vertex and fragment shaders
+	glAttachShader(prog, vertShader);
+	glAttachShader(prog, fragShader);
+	glLinkProgram(prog);
+
+	// Check for linking success
+	GLint linked;
+	glGetProgramiv(prog, GL_LINK_STATUS, &linked);
+
+	if (!linked)
+		PrintShaderInfoLog(prog);
+
+	glDetachShader(prog, vertShader);
+	glDetachShader(prog, fragShader);
+
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
+
+	attrPos = glGetAttribLocation(prog, "vertexPosition");
+	attrNor = glGetAttribLocation(prog, "vertexNormal");
+	attrCol = glGetAttribLocation(prog, "vertexColor");
+	attrUV = glGetAttribLocation(prog, "vertexUV");
+}
+
 void Shader::Upload()
 {    
     if(loaded)
@@ -33,9 +100,9 @@ void Shader::Upload()
 
     Engine::LogInfo("Loading " + vertexFilename);
     Engine::LogInfo("Loading " + fragmentFilename);
-
-    vertShader = glCreateShader(GL_VERTEX_SHADER);
-    fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	
+	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
     prog = glCreateProgram();
 
 	std::string vertexSource = ReadFile(vertexFilename);
@@ -77,6 +144,12 @@ void Shader::Upload()
 
     if (!linked)
 		PrintShaderInfoLog(prog);
+
+	glDetachShader(prog, vertShader);
+	glDetachShader(prog, fragShader);
+
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
 
     attrPos = glGetAttribLocation(prog, "vertexPosition");
     attrNor = glGetAttribLocation(prog, "vertexNormal");

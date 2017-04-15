@@ -55,6 +55,27 @@ Shader *Material::GetShader()
     return shader;
 }
 
+void Material::Reload()
+{
+	// After reloading the shader, we need to update all the uniforms, because the shader may have changed them
+	this->shader->Reload();
+
+	for (IntUniformIterator v = intUniforms.begin(); v != intUniforms.end(); v++)
+		ReloadUniformValue((*v).first, intUniforms);
+
+	for (VectorUniformIterator v = vectorUniforms.begin(); v != vectorUniforms.end(); v++)
+		ReloadUniformValue((*v).first, vectorUniforms);
+
+	for (MatrixUniformIterator m = matrixUniforms.begin(); m != matrixUniforms.end(); m++)
+		ReloadUniformValue((*m).first, matrixUniforms);
+
+	for (MatrixArrayUniformIterator m = matrixArrayUniforms.begin(); m != matrixArrayUniforms.end(); m++)
+		ReloadUniformValue((*m).first, matrixArrayUniforms);
+
+	for (FloatUniformIterator f = floatUniforms.begin(); f != floatUniforms.end(); f++)
+		ReloadUniformValue((*f).first, floatUniforms);
+}
+
 void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime)
 {
     // Important stuff manually, to prevent copying matrices all the time
@@ -228,6 +249,20 @@ T Material::GetUniformValue(std::string name, std::unordered_map<std::string, Ma
         return T();
 
     return (*it).second.value;
+}
+
+template<typename T>
+void Material::ReloadUniformValue(std::string name, std::unordered_map<std::string, MaterialUniform<T>>& map)
+{
+	typename std::unordered_map<std::string, MaterialUniform<T>>::iterator it = map.find(name);
+
+	if (it != map.end())
+	{
+		std::string internalName = GetUniformName(name);
+		MaterialUniform<T> uniform = map[name];
+		uniform.id = shader->GetUniformLocation(internalName.data());
+		map[name] = uniform;
+	}
 }
 
 template<typename T>
