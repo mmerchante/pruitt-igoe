@@ -11,6 +11,8 @@ const std::string MODEL_INVERSE_UNIFORM = "ModelInv";
 const std::string MODEL_INV_TR_UNIFORM = "ModelInvTr";
 const std::string VIEW_PROJ_UNIFORM = "ViewProj";
 const std::string MODEL_VIEW_PROJECTION_UNIFORM = "ModelViewProj";
+const std::string TIME_UNIFORM = "Time";
+const std::string SCREEN_SIZE = "ScreenSize";
 
 void Material::PrepareCoreUniforms()
 {
@@ -20,11 +22,14 @@ void Material::PrepareCoreUniforms()
 
     SetUniformValue(MODEL_VIEW_PROJECTION_UNIFORM, matrixUniforms, glm::mat4(), true, 1);
     SetUniformValue(VIEW_PROJ_UNIFORM, matrixUniforms, glm::mat4(), true, 1);
+
+	SetUniformValue(TIME_UNIFORM, floatUniforms, 0.f, true, 1);
+	SetUniformValue(SCREEN_SIZE, vectorUniforms, glm::vec4(0), true, 1);
 }
 
 const std::string Material::GetUniformName(std::string baseName)
 {
-    return (std::string("u_") + baseName);
+	return baseName; // (std::string("u_") + baseName);
 }
 
 Material::Material(Shader *shader) : blendOperation(BlendOperation(GL_ONE, GL_ZERO)), overrideDrawingMode(-1), queue(Material::Geometry), shader(nullptr), featureMap()
@@ -36,7 +41,6 @@ Material::Material(Shader *shader) : blendOperation(BlendOperation(GL_ONE, GL_ZE
 
     // Should check if it exists..
     this->shader = shader;
-
     this->shader->Upload();
 
     PrepareCoreUniforms();
@@ -51,7 +55,7 @@ Shader *Material::GetShader()
     return shader;
 }
 
-void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose)
+void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime)
 {
     // Important stuff manually, to prevent copying matrices all the time
     shader->SetMatrixUniform(matrixUniforms[MODEL_UNIFORM].id, localToWorld);
@@ -59,6 +63,10 @@ void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &l
     shader->SetMatrixUniform(matrixUniforms[MODEL_INV_TR_UNIFORM].id, invTranspose);
     shader->SetMatrixUniform(matrixUniforms[MODEL_VIEW_PROJECTION_UNIFORM].id, viewProj * localToWorld);
     shader->SetMatrixUniform(matrixUniforms[VIEW_PROJ_UNIFORM].id, viewProj);
+	shader->SetFloatUniform(floatUniforms[TIME_UNIFORM].id, currentTime);
+	
+	glm::vec2 screenSize = Engine::GetScreenSize();
+	shader->SetVectorUniform(vectorUniforms[SCREEN_SIZE].id, glm::vec4(screenSize.x, screenSize.y, 1.f / screenSize.x, 1.f / screenSize.y));
 
     // Send int uniforms!
     for(IntUniformIterator v = intUniforms.begin(); v != intUniforms.end(); v++)

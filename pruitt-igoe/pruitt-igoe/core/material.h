@@ -77,7 +77,7 @@ public:
 
     Shader * GetShader();
 
-    void Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose);
+    void Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime);
 
     void SetInt(std::string name, int i);
     void SetFloat(std::string name, float f);

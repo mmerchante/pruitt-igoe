@@ -122,5 +122,7 @@
   <ItemGroup>
     <None Include="glsl\flat.frag.glsl" />
     <None Include="glsl\flat.vert.glsl" />
+    <None Include="glsl\pennFlag.vert.glsl" />
+    <None Include="glsl\pennFlag.frag.glsl" />
   </ItemGroup>
 </Project>

@@ -118,6 +118,11 @@ void Engine::Update(float deltaTime)
     this->time += deltaTime;
     this->deltaTime = deltaTime;
 
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	{
+		LogInfo("keyyyy");
+	}
+
     log->FlushAll();
 
     // Make sure time has passed!
@@ -189,7 +194,7 @@ void Engine::Start()
 	while (window->isOpen())
 	{
 		std::chrono::steady_clock::time_point frameClock = std::chrono::high_resolution_clock::now();
-		double delta = std::chrono::duration<double, std::milli>(frameClock - lastFrameClock).count();
+		double delta = std::chrono::duration<double, std::milli>(frameClock - lastFrameClock).count() / 1000.0;
 		this->lastFrameClock = frameClock;
 
 		sf::Event event;

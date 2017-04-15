@@ -25,7 +25,7 @@ int main()
 	GameObject * cameraGO = GameObject::Instantiate("mainCamera");
 	PerspectiveCamera * mainCamera = cameraGO->AddComponent<PerspectiveCamera>();
 		
-	Material * material = new Material("flat");
+	Material * material = new Material("pennFlag");
 	material->SetFeature(GL_DEPTH_TEST, false);
 
 	GameObject * quadGO = GameObject::Instantiate("quad");
