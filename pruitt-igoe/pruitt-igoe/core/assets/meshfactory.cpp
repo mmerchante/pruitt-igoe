@@ -1,4 +1,48 @@
-//#include "meshfactory.h"
+#include "meshfactory.h"
+#include "mesh.h"
+
+Mesh *MeshFactory::BuildQuad(bool writeOnly)
+{
+	int vertexCount = 4;
+	int indicesCunt = 6;
+
+	GLuint * indices = new GLuint[indicesCunt];
+	glm::vec4 * vertices = new glm::vec4[vertexCount];
+	glm::vec2 * UVs = new glm::vec2[vertexCount];
+
+	int index = 0;
+
+	// Vertices are aligned to (0,0)
+	vertices[index++] = glm::vec4(0, 0, 0, 1.0f);
+	vertices[index++] = glm::vec4(1, 0, 0, 1.0f);
+	vertices[index++] = glm::vec4(1, 1, 0, 1.0f);
+	vertices[index++] = glm::vec4(0, 1, 0, 1.0f);
+
+	index = 0;
+	UVs[index++] = glm::vec2(0, 0);
+	UVs[index++] = glm::vec2(1, 0);
+	UVs[index++] = glm::vec2(1, 1);
+	UVs[index++] = glm::vec2(0, 1);
+
+	// Upper side
+	index = 0;
+	indices[index++] = 0;
+	indices[index++] = 1;
+	indices[index++] = 2;
+
+	indices[index++] = 2;
+	indices[index++] = 3;
+	indices[index++] = 0;
+
+	Mesh * output = new Mesh();
+	output->SetIndices(indices, indicesCunt);
+	output->SetVertices(vertices, vertexCount);
+	output->SetUVs(UVs, vertexCount);
+	output->Upload(writeOnly);
+
+	return output;
+}
+
 //
 //static const int CUB_IDX_COUNT = 36;
 //static const int CUB_VERT_COUNT = 24;
@@ -311,76 +355,7 @@
 //
 //    return output;
 //}
-//
-//Mesh *MeshFactory::BuildCross()
-//{
-//    GLuint * indices = new GLuint[4];
-//    glm::vec4 * vertices = new glm::vec4[4];
-//
-//    indices[0] = 0;
-//    indices[1] = 1;
-//    indices[2] = 2;
-//    indices[3] = 3;
-//
-//    vertices[0] = glm::vec4(-.5f, 0.f, 0.f, 1.f);
-//    vertices[1] = glm::vec4(.5f, 0.f, 0.f, 1.f);
-//    vertices[2] = glm::vec4(0.f, -.5f, 0.f, 1.f);
-//    vertices[3] = glm::vec4(0.f, .5f, 0.f, 1.f);
-//
-//    Mesh * output = new Mesh();
-//    output->SetIndices(indices, 4);
-//    output->SetVertices(vertices, 4);
-//    output->SetWriteOnly(true); // So we don't worry about these arrays being leaked...
-//    output->Upload();
-//
-//    return output;
-//}
-//
-//Mesh *MeshFactory::BuildQuad(bool writeOnly)
-//{
-//    int vertexCount = 4;
-//    int indicesCunt = 6;
-//
-//    GLuint * indices = new GLuint[indicesCunt];
-//    glm::vec4 * vertices = new glm::vec4[vertexCount];
-//    glm::vec2 * UVs = new glm::vec2[vertexCount];
-//
-//    int index = 0;
-//
-//    // Vertices are aligned to (0,0)
-//    vertices[index++] = glm::vec4(0, 0, 0, 1.0f);
-//    vertices[index++] = glm::vec4(1, 0, 0, 1.0f);
-//    vertices[index++] = glm::vec4(1, 1, 0, 1.0f);
-//    vertices[index++] = glm::vec4(0, 1, 0, 1.0f);
-//
-//    index = 0;
-//
-//    UVs[index++] = glm::vec2(0,0);
-//    UVs[index++] = glm::vec2(1,0);
-//    UVs[index++] = glm::vec2(1,1);
-//    UVs[index++] = glm::vec2(0,1);
-//
-//    index = 0;
-//
-//    // Upper side
-//    indices[index++] = 0;
-//    indices[index++] = 1;
-//    indices[index++] = 2;
-//
-//    indices[index++] = 2;
-//    indices[index++] = 3;
-//    indices[index++] = 0;
-//
-//    Mesh * output = new Mesh();
-//    output->SetIndices(indices, indicesCunt);
-//    output->SetVertices(vertices, vertexCount);
-//    output->SetUVs(UVs, vertexCount);
-//    output->SetWriteOnly(writeOnly);
-//    output->Upload();
-//
-//    return output;
-//}
-//
+
 //Mesh *MeshFactory::BuildMeshFromTexture(ReadableTexture *texture)
 //{
 //    std::vector<glm::uint> indices;

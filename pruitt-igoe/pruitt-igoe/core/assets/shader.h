@@ -2,9 +2,8 @@
 #define SHADER_H
 
 #include "../../common.h"
-
-#include <vector>
 #include "asset.h"
+#include <vector>
 
 class Mesh;
 
@@ -13,6 +12,9 @@ class Shader: public Asset
 public:
     Shader();
     ~Shader();
+
+	void LoadFromFilename(std::string filename);
+	std::string GetName();
 
     void Upload();
     void Bind();
@@ -24,30 +26,16 @@ public:
     void SetMatrixArrayUniform(int uniform, glm::mat4* matrix, int size);
     void SetVectorUniform(int uniform, const glm::vec4& v);
     void SetIVectorUniform(int uniform, const glm::ivec4 &v);
-    void SetTextureUniform(int uniform, GLuint value);
-    
-    std::string GetName();
-
-    void LoadFromFilename(std::string filename);
+    void SetTextureUniform(int uniform, GLuint value);   
 
 protected:
 
-	char* textFileRead(const char*);
+	std::string ReadFile(const std::string& filename);
 	
-	void printShaderInfoLog(int shader);
-	
-	void printLinkInfoLog(int prog);
-
+	void PrintShaderInfoLog(int shader);
 	int GetUniformLocation(const char *uniform);
 	
-	//QString qTextFileRead(const char*);
-
-	
 private:
-
-	// We only need one context, so we're going to access functions directly through glew
-	//OpenGLContext * context;
-
 	std::string shaderName;
 	std::string vertexFilename;
 	std::string fragmentFilename;

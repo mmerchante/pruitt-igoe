@@ -70,7 +70,6 @@ private:
 
 	Vertex * interleavedData;
 
-	// GPU related
 	GLuint bufIdx;
 	GLuint bufInterleaved;
 	GLuint bufPos;
