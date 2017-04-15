@@ -165,7 +165,7 @@ void Engine::Render()
 		glViewport(0, 0, screenSize.x, screenSize.y);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.2, 0.2, 0.2, 0.0);
+		glClearColor(0.1, 0.1, 0.1, 1.0);
 
 		for (RendererIterator r = renderers.begin(); r != renderers.end(); r++)
 		{

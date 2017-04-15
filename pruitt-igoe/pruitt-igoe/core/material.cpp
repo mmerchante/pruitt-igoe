@@ -36,6 +36,7 @@ Material::Material(Shader *shader) : blendOperation(BlendOperation(GL_ONE, GL_ZE
 
     // Should check if it exists..
     this->shader = shader;
+
     this->shader->Upload();
 
     PrepareCoreUniforms();

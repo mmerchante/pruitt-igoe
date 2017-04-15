@@ -119,4 +119,8 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="glsl\flat.frag.glsl" />
+    <None Include="glsl\flat.vert.glsl" />
+  </ItemGroup>
 </Project>

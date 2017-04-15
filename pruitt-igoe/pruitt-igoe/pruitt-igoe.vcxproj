@@ -166,6 +166,10 @@
   <ItemGroup>
     <Image Include="test.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="glsl\flat.frag.glsl" />
+    <None Include="glsl\flat.vert.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

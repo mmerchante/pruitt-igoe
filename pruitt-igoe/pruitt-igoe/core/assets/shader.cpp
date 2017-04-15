@@ -40,10 +40,16 @@ void Shader::Upload()
 
 	std::string vertexSource = ReadFile(vertexFilename);
 	std::string fragmentSource = ReadFile(fragmentFilename);
+	
+	Engine::LogVerbose("VERTEX SHADER: \n" + vertexSource);
+	Engine::LogVerbose("FRAGMENT SHADER: \n" + fragmentSource);
+
+	const char * vertSource = vertexSource.c_str();
+	const char * fragSource = fragmentSource.c_str();
 
     // Send the shader text to OpenGL and store it in the shaders specified by the handles vertShader and fragShader
-    glShaderSource(vertShader, 1, (const GLchar * const *) vertexSource.c_str(), 0);
-    glShaderSource(fragShader, 1, (const GLchar * const *) fragmentSource.c_str(), 0);
+    glShaderSource(vertShader, 1, &vertSource, 0);
+    glShaderSource(fragShader, 1, &fragSource, 0);
 
     // Tell OpenGL to compile the shader text stored above
     glCompileShader(vertShader);
@@ -68,6 +74,7 @@ void Shader::Upload()
     // Check for linking success
     GLint linked;
     glGetProgramiv(prog, GL_LINK_STATUS, &linked);
+
     if (!linked)
 		PrintShaderInfoLog(prog);
 
@@ -88,7 +95,7 @@ void Shader::Bind()
 void Shader::Render(Mesh *mesh, GLenum drawMode)
 {
     Bind();
-
+	
     if(mesh->IsInterleaved())
     {
         if(mesh->BindInterleaved())

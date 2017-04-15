@@ -12,11 +12,11 @@ Mesh *MeshFactory::BuildQuad(bool writeOnly)
 
 	int index = 0;
 
-	// Vertices are aligned to (0,0)
-	vertices[index++] = glm::vec4(0, 0, 0, 1.0f);
-	vertices[index++] = glm::vec4(1, 0, 0, 1.0f);
+	// Vertices are optimized for full screen quad
+	vertices[index++] = glm::vec4(-1, -1, 0, 1.0f);
+	vertices[index++] = glm::vec4(1, -1, 0, 1.0f);
 	vertices[index++] = glm::vec4(1, 1, 0, 1.0f);
-	vertices[index++] = glm::vec4(0, 1, 0, 1.0f);
+	vertices[index++] = glm::vec4(-1, 1, 0, 1.0f);
 
 	index = 0;
 	UVs[index++] = glm::vec2(0, 0);
