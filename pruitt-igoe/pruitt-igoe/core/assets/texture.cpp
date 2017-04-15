@@ -32,7 +32,6 @@ GLuint Texture::GetTextureID()
 
 void Texture::LoadFromRaw(const uint8_t * pixels, int width, int height, const TextureParameters & p)
 {
-	// TODO: handle/hide re-creation
 	if (this->IsValid())
 		return;
 
@@ -59,7 +58,6 @@ void Texture::LoadFromFilename(const std::string & filename, const TextureParame
 {
 	sf::Image image;
 
-	std::cout << filename << std::endl;
 	if(!image.loadFromFile(filename))
 		return;
 		
