@@ -3,6 +3,7 @@
 #include "texture.h"
 #include <iostream>
 #include <fstream>
+#include "../engine.h"
 
 const std::string SHADER_BASE_DIRECTORY = "./glsl/";
 
@@ -29,9 +30,9 @@ void Shader::Upload()
 {    
     if(loaded)
         return;
-/*
+
     Engine::LogInfo("Loading " + vertexFilename);
-    Engine::LogInfo("Loading " + fragmentFilename);*/
+    Engine::LogInfo("Loading " + fragmentFilename);
 
     vertShader = glCreateShader(GL_VERTEX_SHADER);
     fragShader = glCreateShader(GL_FRAGMENT_SHADER);

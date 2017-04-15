@@ -135,10 +135,15 @@
     <ClCompile Include="core\assets\rendertargettexture.cpp" />
     <ClCompile Include="core\assets\shader.cpp" />
     <ClCompile Include="core\assets\texture.cpp" />
+    <ClCompile Include="core\component.cpp" />
+    <ClCompile Include="core\components\camera.cpp" />
+    <ClCompile Include="core\components\renderer.cpp" />
+    <ClCompile Include="core\engine.cpp" />
+    <ClCompile Include="core\gameobject.cpp" />
+    <ClCompile Include="core\log.cpp" />
     <ClCompile Include="core\material.cpp" />
+    <ClCompile Include="core\transform.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="renderer\GLRenderer.cpp" />
-    <ClCompile Include="renderer\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -149,9 +154,14 @@
     <ClInclude Include="core\assets\rendertargettexture.h" />
     <ClInclude Include="core\assets\shader.h" />
     <ClInclude Include="core\assets\texture.h" />
+    <ClInclude Include="core\component.h" />
+    <ClInclude Include="core\components\camera.h" />
+    <ClInclude Include="core\components\renderer.h" />
+    <ClInclude Include="core\engine.h" />
+    <ClInclude Include="core\gameobject.h" />
+    <ClInclude Include="core\log.h" />
     <ClInclude Include="core\material.h" />
-    <ClInclude Include="renderer\GLRenderer.h" />
-    <ClInclude Include="renderer\Renderer.h" />
+    <ClInclude Include="core\transform.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="test.png" />
