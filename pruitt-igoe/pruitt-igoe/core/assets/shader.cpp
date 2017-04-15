@@ -41,8 +41,8 @@ void Shader::Upload()
 	std::string vertexSource = ReadFile(vertexFilename);
 	std::string fragmentSource = ReadFile(fragmentFilename);
 	
-	Engine::LogVerbose("VERTEX SHADER: \n" + vertexSource);
-	Engine::LogVerbose("FRAGMENT SHADER: \n" + fragmentSource);
+	//Engine::LogVerbose("VERTEX SHADER: \n" + vertexSource);
+	//Engine::LogVerbose("FRAGMENT SHADER: \n" + fragmentSource);
 
 	const char * vertSource = vertexSource.c_str();
 	const char * fragSource = fragmentSource.c_str();

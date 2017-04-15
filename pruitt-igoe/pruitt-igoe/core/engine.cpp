@@ -100,12 +100,26 @@ void Engine::Initialize(sf::Window * window)
 	this->window = window;
     this->uiCamera = GameObject::Instantiate("UICamera")->AddComponent<UICamera>();
 	this->lastFrameClock = std::chrono::high_resolution_clock::now();
-	
+		
 	// Load GLEW
 	GLenum err = glewInit();
 
+	// Show this before, just in case there's an error
+	std::cout << "--------------------------------------" << std::endl;
+	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;;
+	std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+	std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;;
+	std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
+	std::cout << "--------------------------------------" << std::endl;
+	
 	if (err != GLEW_OK) {
 		std::cerr << "glewInit failed: " << glewGetErrorString(err) << std::endl;
+		exit(1);
+	}
+
+	if (!GLEW_VERSION_3_0)
+	{
+		LogError("OpenGL 3.0 not supported.");
 		exit(1);
 	}
 
