@@ -39,4 +39,23 @@ protected:
 	TextureParameters parameters;
 };
 
+class RenderTexture : public Texture
+{
+public:
+	RenderTexture(int width, int height, bool depth, int precision, TextureParameters p);
+	virtual ~RenderTexture();
+
+	GLuint GetFramebufferID();
+	GLuint GetDepthbufferID();
+
+	void Load();
+	void GenerateMipmaps();
+
+protected:
+	GLuint framebufferID;
+	GLuint depthbufferID;
+	bool depth;
+	int precision;
+};
+
 #endif // TEXTURE_H

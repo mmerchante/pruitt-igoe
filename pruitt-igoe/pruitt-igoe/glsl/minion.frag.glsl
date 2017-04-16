@@ -522,7 +522,9 @@ void main()
 	// Gamma correction
 	color = pow(color, vec3(.45454));
 
+	float normalizedIterations = iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS);
 	vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS));
 	//color = mix(color, debugColor, u_debug);
-	out_Col = vec4(color, 1.0);
+
+	out_Col = vec4(normalizedIterations, normalizedIterations, normalizedIterations, 1.0);
 }

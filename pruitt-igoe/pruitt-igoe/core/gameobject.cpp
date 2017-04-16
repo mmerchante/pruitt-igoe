@@ -4,7 +4,7 @@
 #include "input.h"
 #include <iostream>
 
-GameObject::GameObject(const std::string& name) : name(name), components(), transform(this, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f)), isDestroyed(false), enabled(true)
+GameObject::GameObject(const std::string& name) : name(name), components(), transform(this, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f)), isDestroyed(false), enabled(true), layer(1)
 {
 }
 
@@ -87,6 +87,16 @@ std::string GameObject::ToString()
 const std::string &GameObject::Name()
 {
     return name;
+}
+
+int GameObject::GetLayer()
+{
+	return layer;
+}
+
+void GameObject::SetLayer(int layer)
+{
+	this->layer = layer;
 }
 
 bool GameObject::IsEnabledInHierarchy()

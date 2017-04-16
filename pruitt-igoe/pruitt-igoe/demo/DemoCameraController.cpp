@@ -19,24 +19,27 @@ void DemoCameraController::Update()
 	glm::vec3 forward = t->Forward();
 	glm::vec3 right = t->Right();
 	glm::vec3 displacement = right * velocity.x + forward * velocity.z;
-	
+
 	t->SetLocalPosition(t->LocalPosition() + displacement * Engine::DeltaTime());
 
-	glm::vec2 mousePos = Engine::GetInstance()->GetCurrentMousePosition();
-	glm::vec2 screenCenter = glm::vec2(Engine::GetScreenSize()) * .5f;
+	if (Engine::GetInstance()->GetWindow()->hasFocus())
+	{
+		glm::vec2 mousePos = Engine::GetInstance()->GetCurrentMousePosition();
+		glm::vec2 screenCenter = glm::vec2(Engine::GetScreenSize()) * .5f;
 
-	glm::vec2 delta = mousePos - screenCenter;
-	
-	if (std::fabs(delta.x) < 0.001f && std::fabs(delta.y) < .001f)
-		return;
+		glm::vec2 delta = mousePos - screenCenter;
 
-	float sensibility = .1f;
+		if (std::fabs(delta.x) < 0.001f && std::fabs(delta.y) < .001f)
+			return;
 
-	this->verticalAngle -= delta.y * sensibility * Engine::DeltaTime();
-	this->horizontalAngle -= delta.x * sensibility * Engine::DeltaTime();
-	
-	// Hacky, but SFML is not very flexible with this...
-	sf::Mouse::setPosition(sf::Vector2i(screenCenter.x, screenCenter.y), *Engine::GetInstance()->GetWindow());
+		float sensibility = .1f;
+
+		this->verticalAngle -= delta.y * sensibility * Engine::DeltaTime();
+		this->horizontalAngle -= delta.x * sensibility * Engine::DeltaTime();
+
+		// Hacky, but SFML is not very flexible with this...
+		sf::Mouse::setPosition(sf::Vector2i(screenCenter.x, screenCenter.y), *Engine::GetInstance()->GetWindow());
+	}
 	
 	// Clamp vertical angle
 	this->verticalAngle = glm::clamp(verticalAngle, -.49f * glm::pi<float>(), .49f * glm::pi<float>());

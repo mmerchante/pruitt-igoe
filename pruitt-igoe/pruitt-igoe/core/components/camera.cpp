@@ -4,6 +4,9 @@
 Camera::~Camera()
 {
     Engine::GetInstance()->DeregisterCamera(this);
+
+	if (this->renderTexture != nullptr)
+		delete this->renderTexture;
 }
 
 void Camera::Awake()
@@ -14,7 +17,10 @@ void Camera::Awake()
 	this->height = Engine::GetInstance()->GetScreenSize().y;
     this->nearClip = .1f;
     this->farClip = 1000.f;
-    this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
+    this->backgroundColor = glm::vec4(.2f, .2f, .2f, 0.f);
+	this->mask = CullingMask::Default;
+	this->clearColor = true;
+	this->clearDepth = true;
 
     Engine::GetInstance()->RegisterCamera(this);
 }
@@ -60,6 +66,52 @@ float Camera::GetNearClip()
 	return nearClip;
 }
 
+void Camera::Render()
+{
+	if(renderTexture != nullptr)
+		glBindFramebuffer(GL_FRAMEBUFFER, renderTexture->GetFramebufferID());
+	else
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, width, height);
+
+	int flags = 0;
+	if (clearColor)
+		flags |= GL_COLOR_BUFFER_BIT;
+
+	if(clearDepth)
+		flags |= GL_DEPTH_BUFFER_BIT;
+
+	if (flags)
+	{
+		glClear(flags);
+		glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.z);
+	}
+}
+
+void Camera::FinishRender()
+{
+	if (this->renderTexture != nullptr)
+	{
+		this->renderTexture->GenerateMipmaps();
+	}
+}
+
+bool Camera::Cull(int layer)
+{
+	return (layer & this->mask) == 0;
+}
+
+void Camera::SetRenderTexture(RenderTexture * rt)
+{
+	this->renderTexture = rt;
+}
+
+RenderTexture * Camera::GetRenderTexture()
+{
+	return renderTexture;
+}
+
 glm::mat4 PerspectiveCamera::ComputeProjectionMatrix()
 {
     return glm::perspective(glm::radians(fieldOfView), aspect, nearClip, farClip);
@@ -94,7 +146,10 @@ void UICamera::Awake()
 	this->height = Engine::GetInstance()->GetScreenSize().y;
     this->nearClip = .1f;
     this->farClip = 100.f;
+	this->mask = CullingMask::All; //TODO: add UI later
     this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
+	this->clearColor = false;
+	this->clearDepth = false; // UI draws over everything
 }
 
 UICamera::~UICamera()

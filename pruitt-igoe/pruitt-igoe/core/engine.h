@@ -94,7 +94,6 @@ private:
 	void DeleteGameObjects();
 
 	void RenderUI();
-
 };
 
 #endif // ENGINE_H

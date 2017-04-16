@@ -77,3 +77,76 @@ void Texture::LoadFromFilename(const std::string & filename, const TextureParame
 
 	LoadFromRaw(pixels, image.getSize().x, image.getSize().y, p);
 }
+
+RenderTexture::RenderTexture(int width, int height, bool depth, int precision, TextureParameters p) : Texture(), depth(depth), precision(precision)
+{
+	this->width = width;
+	this->height = height;
+	this->parameters = p;
+}
+
+RenderTexture::~RenderTexture()
+{
+	glDeleteFramebuffers(1, &framebufferID);
+	glDeleteFramebuffers(1, &depthbufferID);
+}
+
+GLuint RenderTexture::GetFramebufferID()
+{
+	return framebufferID;
+}
+
+GLuint RenderTexture::GetDepthbufferID()
+{
+	return depthbufferID;
+}
+
+void RenderTexture::Load()
+{
+	// FBO generation
+	glGenFramebuffers(1, &framebufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+
+	// Texture generation
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, parameters.minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, parameters.magFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, parameters.wrapS);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, parameters.wrapT);
+
+	if (parameters.minFilter == GL_LINEAR_MIPMAP_LINEAR || parameters.minFilter == GL_LINEAR_MIPMAP_NEAREST || 
+		parameters.minFilter == GL_NEAREST_MIPMAP_NEAREST || parameters.minFilter == GL_NEAREST_MIPMAP_LINEAR)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Depth buffer
+	glGenRenderbuffers(1, &depthbufferID);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthbufferID);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbufferID);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureID, 0);
+
+	// TODO: MRT if needed
+	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, DrawBuffers);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void RenderTexture::GenerateMipmaps()
+{
+	if (parameters.minFilter == GL_LINEAR_MIPMAP_LINEAR || parameters.minFilter == GL_LINEAR_MIPMAP_NEAREST ||
+		parameters.minFilter == GL_NEAREST_MIPMAP_NEAREST || parameters.minFilter == GL_NEAREST_MIPMAP_LINEAR)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+}

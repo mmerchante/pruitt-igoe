@@ -132,7 +132,6 @@
     <ClCompile Include="core\assets\assetdatabase.cpp" />
     <ClCompile Include="core\assets\mesh.cpp" />
     <ClCompile Include="core\assets\meshfactory.cpp" />
-    <ClCompile Include="core\assets\rendertargettexture.cpp" />
     <ClCompile Include="core\assets\shader.cpp" />
     <ClCompile Include="core\assets\texture.cpp" />
     <ClCompile Include="core\component.cpp" />
@@ -159,7 +158,6 @@
     <ClInclude Include="core\assets\assetdatabase.h" />
     <ClInclude Include="core\assets\mesh.h" />
     <ClInclude Include="core\assets\meshfactory.h" />
-    <ClInclude Include="core\assets\rendertargettexture.h" />
     <ClInclude Include="core\assets\shader.h" />
     <ClInclude Include="core\assets\texture.h" />
     <ClInclude Include="core\component.h" />
@@ -192,6 +190,8 @@
     <None Include="glsl\minion.frag.glsl" />
     <None Include="glsl\pennFlag.frag.glsl" />
     <None Include="glsl\pennFlag.vert.glsl" />
+    <None Include="glsl\shadingPass.frag.glsl" />
+    <None Include="glsl\shadingPass.vert.glsl" />
     <None Include="glsl\ui.frag.glsl" />
     <None Include="glsl\ui.vert.glsl" />
   </ItemGroup>

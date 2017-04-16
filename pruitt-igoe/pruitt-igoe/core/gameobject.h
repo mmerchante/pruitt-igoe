@@ -28,6 +28,9 @@ public:
     std::string ToString();
     const std::string& Name();
 
+	int GetLayer();
+	void SetLayer(int layer);
+
     bool IsEnabledInHierarchy(); // Warning: recursive
     void SetEnabled(bool enabled);
 
@@ -94,6 +97,7 @@ private:
 	Transform transform;
 	bool isDestroyed;
 	bool enabled;
+	int layer;
 
 	// We don't want any stack allocated game object...
 	GameObject(const std::string &name);

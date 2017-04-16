@@ -86,6 +86,8 @@ void Engine::RenderUI()
 {
     Camera * camera = uiCamera;
     glm::mat4 viewProj = camera->GetViewProjectionMatrix();
+
+	camera->Render();
 	
     for (UIRendererIterator r = uiRenderers.begin(); r != uiRenderers.end(); r++)
     {
@@ -176,29 +178,31 @@ void Engine::Render()
 	glm::ivec2 screenSize = GetScreenSize();
 
 	//Render Objects
-	glViewport(0, 0, screenSize.x, screenSize.y);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	//glViewport(0, 0, screenSize.x, screenSize.y);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(0.1, 0.1, 0.1, 1.0);
 
-	// For now, this is a formality, as we don't actually have multiple viewports... (TODO)
 	for (CameraIterator c = cameras.begin(); c != cameras.end(); c++)
 	{
 		Camera * camera = *c;
         camera->UpdateScreenSize();
 		glm::mat4 viewProj = camera->GetViewProjectionMatrix();
 
+		camera->Render();
 
 		for (RendererIterator r = renderers.begin(); r != renderers.end(); r++)
 		{
 			Renderer * renderer = *r;
 
-            if (renderer->GetGameObject()->IsEnabledInHierarchy() && renderer->IsEnabled())
+            if (renderer->GetGameObject()->IsEnabledInHierarchy() && !camera->Cull(renderer->GetGameObject()->GetLayer()) && renderer->IsEnabled())
                 renderer->Render(viewProj);
 		}
+
+		camera->FinishRender();
 	}   
 
     // Now render the UI
-    RenderUI();
+    //RenderUI();
 }
 
 // This is the main loop
@@ -222,6 +226,7 @@ void Engine::Start()
 			if (event.type == sf::Event::Closed ||
 				(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Escape))
 				window->close();
+					
 
 			if (event.type == sf::Event::MouseEntered)
 			{
@@ -229,7 +234,8 @@ void Engine::Start()
 				mouseLocked = true;
 			}
 
-			if (event.type == sf::Event::MouseLeft)
+			if (event.type == sf::Event::MouseLeft ||
+				(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Space))
 			{
 				window->setMouseCursorGrabbed(false);
 				mouseLocked = false;
