@@ -34,16 +34,16 @@ void Transform::UpdateMatrices()
         (*c)->UpdateMatrices();
 }
 
-const glm::mat4& Transform::T()
+const glm::mat4& Transform::LocalToWorldMatrix()
 {
     return worldTransform;
 }
 
-const glm::mat4& Transform::invT()
+const glm::mat4& Transform::WorldToLocalMatrix()
 {
     return inverse_worldTransform;
 }
-const glm::mat4& Transform::invTransT()
+const glm::mat4& Transform::InverseTransposeMatrix()
 {
     return inverse_transpose_worldTransform;
 }
@@ -60,7 +60,8 @@ const glm::vec3 Transform::WorldPosition()
 
 const glm::vec3 Transform::Forward()
 {
-    return glm::vec3(worldTransform * glm::vec4(0,0,1,0));
+	// Right handed
+    return glm::vec3(worldTransform * glm::vec4(0,0,-1,0));
 }
 
 const glm::vec3 Transform::Up()
@@ -153,6 +154,13 @@ void Transform::RotateLocal(const glm::quat &q)
 {
     this->rotation  = q * rotation;
     UpdateMatrices();
+}
+
+void Transform::LookAt(const glm::vec3 & target)
+{
+	glm::mat4 lookAtM = glm::lookAt(position, target, this->Up());
+	this->rotation = glm::conjugate(glm::toQuat(lookAtM));
+	UpdateMatrices();
 }
 
 Transform *Transform::GetParent()

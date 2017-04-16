@@ -22,7 +22,8 @@ void Camera::Awake()
 void Camera::PhysicsUpdate()
 {
     this->aspect = width / (float)height;
-    this->viewProjectionMatrix = ComputeViewProjectionMatrix();
+	this->projectionMatrix = ComputeProjectionMatrix();
+    this->viewProjectionMatrix = projectionMatrix * this->GetTransform()->WorldToLocalMatrix();
 }
 
 void Camera::UpdateScreenSize()
@@ -31,6 +32,11 @@ void Camera::UpdateScreenSize()
 	this->height = Engine::GetInstance()->GetScreenSize().y;
 
     PhysicsUpdate();
+}
+
+const glm::mat4 & Camera::GetProjectionMatrix()
+{
+	return projectionMatrix;
 }
 
 const glm::mat4 &Camera::GetViewProjectionMatrix()
@@ -44,16 +50,19 @@ const glm::vec3 Camera::GetViewVector()
     return  trans->Forward();
 }
 
-glm::mat4 PerspectiveCamera::ComputeViewProjectionMatrix()
+float Camera::GetFarClip()
 {
-    Transform * trans = this->gameObject->GetTransform();
+	return farClip;
+}
 
-    glm::vec3 cameraPosition = trans->WorldPosition();
-    glm::vec3 forward = trans->Forward();
-    glm::vec3 up = trans->Up();
-    glm::vec3 target = cameraPosition + forward;
+float Camera::GetNearClip()
+{
+	return nearClip;
+}
 
-    return glm::perspective(glm::radians(fieldOfView), aspect, nearClip, farClip) * glm::lookAt(cameraPosition, target, up);
+glm::mat4 PerspectiveCamera::ComputeProjectionMatrix()
+{
+    return glm::perspective(glm::radians(fieldOfView), aspect, nearClip, farClip);
 }
 
 void PerspectiveCamera::Awake()
@@ -62,16 +71,19 @@ void PerspectiveCamera::Awake()
     this->fieldOfView = 75.f;
 }
 
-glm::mat4 OrthographicCamera::ComputeViewProjectionMatrix()
+void PerspectiveCamera::SetFieldOfView(float fieldOfView)
 {
-    Transform * trans = this->gameObject->GetTransform();
+	this->fieldOfView = fieldOfView;
+}
 
-    glm::vec3 cameraPosition = trans->WorldPosition();
-    glm::vec3 forward = trans->Forward();
-    glm::vec3 up = trans->Up();
-    glm::vec3 target = cameraPosition + forward;
+float PerspectiveCamera::GetFieldOfView()
+{
+	return fieldOfView;
+}
 
-    return glm::ortho(0.f, (float)width, 0.f, (float)height, nearClip, farClip) * glm::lookAt(cameraPosition, target, up);
+glm::mat4 OrthographicCamera::ComputeProjectionMatrix()
+{
+    return glm::ortho(0.f, (float)width, 0.f, (float)height, nearClip, farClip);
 }
 
 void UICamera::Awake()
@@ -89,7 +101,14 @@ UICamera::~UICamera()
 {
 }
 
-glm::mat4 UICamera::ComputeViewProjectionMatrix()
+glm::mat4 UICamera::ComputeProjectionMatrix()
 {
-    return glm::ortho(0.f, (float)width, 0.f, (float)height, nearClip, farClip) * glm::translate(glm::mat4(1), glm::vec3(0,0,-10)); // We need to offset Z a bit
+    return glm::ortho(0.f, (float)width, 0.f, (float)height, nearClip, farClip);
+}
+
+void UICamera::PhysicsUpdate()
+{
+	this->aspect = width / (float)height;
+	this->projectionMatrix = ComputeProjectionMatrix();
+	this->viewProjectionMatrix = projectionMatrix * glm::translate(glm::mat4(1), glm::vec3(0, 0, -10)); // We need to offset Z a bit
 }

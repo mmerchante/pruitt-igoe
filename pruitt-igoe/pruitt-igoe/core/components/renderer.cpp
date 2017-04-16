@@ -46,7 +46,7 @@ void MeshRenderer::Render(const glm::mat4 &viewProj)
     if(this->material != nullptr && this->mesh != nullptr)
     {
         Transform * t = this->gameObject->GetTransform();
-        this->material->Render(mesh, viewProj, t->T(), t->invT(), t->invTransT(), Engine::Time());
+        this->material->Render(mesh, viewProj, t->LocalToWorldMatrix(), t->WorldToLocalMatrix(), t->InverseTransposeMatrix(), Engine::Time());
     }
 }
 
@@ -68,6 +68,6 @@ void UIRenderer::Render(const glm::mat4 &viewProj)
     if(this->material != nullptr && this->mesh != nullptr)
     {
         Transform * t = this->gameObject->GetTransform();
-        this->material->Render(mesh, viewProj, t->T(), t->invT(), t->invTransT(), Engine::Time());
+        this->material->Render(mesh, viewProj, t->LocalToWorldMatrix(), t->WorldToLocalMatrix(), t->InverseTransposeMatrix(), Engine::Time());
     }
 }

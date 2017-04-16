@@ -12,28 +12,11 @@
 #include "core\assets\meshfactory.h"
 #include "core\ui\uitext.h"
 #include "core\ui\uiimage.h"
+#include "demo\DemoController.h"
 
 #include <iostream>
 
-
-class ShaderReloader : public Component, public InputListener
-{
-public:
-
-	Material * material;
-
-	virtual void OnKeyPressEvent(sf::Event::KeyEvent * e)
-	{
-		if (e->code == sf::Keyboard::Key::R)
-		{
-			if (material != nullptr)
-			{
-				material->Reload();
-				Engine::LogInfo("Reloading shader!");
-			}
-		}
-	}
-};
+#define DEBUG true
 
 int main()
 {
@@ -43,30 +26,16 @@ int main()
 	window->setMouseCursorVisible(false);
 
 	engine->Initialize(window);
-
 	engine->GetLog()->SetLogLevel(Log::LogLevel::Verbose);
 
-	GameObject * cameraGO = GameObject::Instantiate("mainCamera");
-	PerspectiveCamera * mainCamera = cameraGO->AddComponent<PerspectiveCamera>();
-		
-	Material * material = new Material("pennFlag");
-	material->SetFeature(GL_DEPTH_TEST, false);
-
-	GameObject * quadGO = GameObject::Instantiate("quad");
-	ShaderReloader * reloader = quadGO->AddComponent<ShaderReloader>();
-	reloader->material = material;
-
-	MeshRenderer * r = quadGO->AddComponent<MeshRenderer>();
-	r->SetMesh(MeshFactory::BuildQuad(true));
-	r->SetMaterial(material);
-
-	GameObject * titleTest = GameObject::Instantiate("Titles");
-	UIImage * image = titleTest->AddComponent<UIImage>();
-	image->SetTexture("./resources/title.png");	
-	image->GetTransform()->UIScale(.1f);
+	GameObject * demo = GameObject::Instantiate("demo");
+	demo->AddComponent<DemoController>();
 	
-	GameObject * fpsCounter = GameObject::Instantiate("fps");
-	fpsCounter->AddComponent<FPSCounter>();
+	if (DEBUG)
+	{
+		GameObject * fpsCounter = GameObject::Instantiate("fps");
+		fpsCounter->AddComponent<FPSCounter>();
+	}
 	
 	engine->Start();
 	

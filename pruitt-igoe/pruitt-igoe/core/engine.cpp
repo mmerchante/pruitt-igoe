@@ -11,7 +11,7 @@
 Engine * Engine::instance = nullptr;
 
 Engine::Engine() : gameObjects(), cameras(), gameObjectsToAdd(),
-    gameObjectsToDelete(), input(new Input()), log(new ConcurrentLog<MultiLog>(new MultiLog())), time(0.f), deltaTime(0.f)
+    gameObjectsToDelete(), input(new Input()), log(new ConcurrentLog<MultiLog>(new MultiLog())), time(0.f), deltaTime(0.f), mouseLocked(false)
 {
     this->log->GetInternalLogger()->AddLogger(new Log(&std::cout));
 }
@@ -99,6 +99,7 @@ void Engine::RenderUI()
 void Engine::Initialize(sf::Window * window)
 {
 	this->window = window;
+	this->window->setKeyRepeatEnabled(false);
     this->uiCamera = GameObject::Instantiate("UICamera")->AddComponent<UICamera>();
 	this->lastFrameClock = std::chrono::high_resolution_clock::now();
 		
@@ -218,13 +219,27 @@ void Engine::Start()
 			if (event.type == sf::Event::Resized)
 				this->OnOpenGLContextChanged();
 
-			if (event.type == sf::Event::Closed)
+			if (event.type == sf::Event::Closed ||
+				(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Escape))
 				window->close();
+
+			if (event.type == sf::Event::MouseEntered)
+			{
+				window->setMouseCursorGrabbed(true);
+				mouseLocked = true;
+			}
+
+			if (event.type == sf::Event::MouseLeft)
+			{
+				window->setMouseCursorGrabbed(false);
+				mouseLocked = false;
+			}
 
 			this->input->HandleEvent(&event);
 		}
 		
 		this->Update(delta);
+
 		this->Render();
 
 		window->display();
@@ -326,7 +341,7 @@ glm::ivec2 Engine::GetScreenSize()
 
 glm::ivec2 Engine::GetCurrentMousePosition()
 {
-	sf::Vector2i p = sf::Mouse::getPosition();
+	sf::Vector2i p = sf::Mouse::getPosition(*GetInstance()->window);
 	return glm::ivec2(p.x, p.y);
 }
 

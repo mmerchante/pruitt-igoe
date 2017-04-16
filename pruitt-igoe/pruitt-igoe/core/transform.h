@@ -12,9 +12,9 @@ public:
 
     void UpdateMatrices();
 
-    const glm::mat4 &T();
-    const glm::mat4 &invT();
-    const glm::mat4 &invTransT();
+    const glm::mat4 &LocalToWorldMatrix();
+    const glm::mat4 &WorldToLocalMatrix();
+    const glm::mat4 &InverseTransposeMatrix();
 
     const glm::vec3 &LocalPosition();
     const glm::vec3 WorldPosition();
@@ -46,6 +46,8 @@ public:
 
     void TranslateLocal(const glm::vec3& t);
     void RotateLocal(const glm::quat& q);
+
+	void LookAt(const glm::vec3& target);
 
     // Scene graph related
     Transform * GetParent();

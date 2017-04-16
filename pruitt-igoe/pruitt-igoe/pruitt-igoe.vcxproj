@@ -148,7 +148,10 @@
     <ClCompile Include="core\ui\uiimage.cpp" />
     <ClCompile Include="core\ui\uitext.cpp" />
     <ClCompile Include="core\components\FPSCounter.cpp" />
+    <ClCompile Include="demo\DemoController.cpp" />
+    <ClCompile Include="demo\DemoCameraController.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="core\components\ShaderReloader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -164,6 +167,7 @@
     <ClInclude Include="core\components\renderer.h" />
     <ClInclude Include="core\engine.h" />
     <ClInclude Include="core\gameobject.h" />
+    <ClInclude Include="core\engine_common.h" />
     <ClInclude Include="core\input.h" />
     <ClInclude Include="core\log.h" />
     <ClInclude Include="core\material.h" />
@@ -172,6 +176,9 @@
     <ClInclude Include="core\ui\uiimage.h" />
     <ClInclude Include="core\ui\uitext.h" />
     <ClInclude Include="core\components\FPSCounter.h" />
+    <ClInclude Include="demo\DemoController.h" />
+    <ClInclude Include="demo\DemoCameraController.h" />
+    <ClInclude Include="core\components\ShaderReloader.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\font.png" />
@@ -181,6 +188,8 @@
   <ItemGroup>
     <None Include="glsl\flat.frag.glsl" />
     <None Include="glsl\flat.vert.glsl" />
+    <None Include="glsl\minion.vert.glsl" />
+    <None Include="glsl\minion.frag.glsl" />
     <None Include="glsl\pennFlag.frag.glsl" />
     <None Include="glsl\pennFlag.vert.glsl" />
     <None Include="glsl\ui.frag.glsl" />

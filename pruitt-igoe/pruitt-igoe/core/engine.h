@@ -62,6 +62,7 @@ private:
 	sf::Window * window;
 	float time;
 	float deltaTime;
+	bool mouseLocked;
 	std::chrono::steady_clock::time_point lastFrameClock;
 
 	std::vector<GameObject*> gameObjects;
