@@ -30,6 +30,8 @@ public:
     void UISetSize(const glm::vec2& size);
     glm::vec2 UIGetSize();
 
+	void UIScale(float scale);
+
     void UISetLocalPosition(glm::vec2 position);
     glm::vec2 UIGetLocalPosition();
 

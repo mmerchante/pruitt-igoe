@@ -66,6 +66,18 @@
     <ClCompile Include="core\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\ui\uicomponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ui\uiimage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ui\uitext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\components\FPSCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
@@ -119,9 +131,27 @@
     <ClInclude Include="core\input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="core\ui\uicomponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ui\uiimage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ui\uitext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\components\FPSCounter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="test.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\font.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\title.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -130,5 +160,7 @@
     <None Include="glsl\flat.vert.glsl" />
     <None Include="glsl\pennFlag.vert.glsl" />
     <None Include="glsl\pennFlag.frag.glsl" />
+    <None Include="glsl\ui.frag.glsl" />
+    <None Include="glsl\ui.vert.glsl" />
   </ItemGroup>
 </Project>

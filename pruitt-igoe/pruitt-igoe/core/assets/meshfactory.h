@@ -10,6 +10,7 @@ class MeshFactory
 {
 public:
     static Mesh * BuildQuad(bool writeOnly = true);
+	static Mesh * BuildUIQuad(bool writeOnly = true);
     //static Mesh * BuildCube(bool interleave, bool writeOnly = true);
     //static Mesh * BuildMeshFromTexture(ReadableTexture * texture);
 };

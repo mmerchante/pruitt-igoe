@@ -86,7 +86,7 @@ void Engine::RenderUI()
 {
     Camera * camera = uiCamera;
     glm::mat4 viewProj = camera->GetViewProjectionMatrix();
-
+	
     for (UIRendererIterator r = uiRenderers.begin(); r != uiRenderers.end(); r++)
     {
         UIRenderer * renderer = *r;
@@ -174,6 +174,11 @@ void Engine::Render()
 
 	glm::ivec2 screenSize = GetScreenSize();
 
+	//Render Objects
+	glViewport(0, 0, screenSize.x, screenSize.y);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.1, 0.1, 0.1, 1.0);
+
 	// For now, this is a formality, as we don't actually have multiple viewports... (TODO)
 	for (CameraIterator c = cameras.begin(); c != cameras.end(); c++)
 	{
@@ -181,11 +186,6 @@ void Engine::Render()
         camera->UpdateScreenSize();
 		glm::mat4 viewProj = camera->GetViewProjectionMatrix();
 
-        //Render Objects
-		glViewport(0, 0, screenSize.x, screenSize.y);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.1, 0.1, 0.1, 1.0);
 
 		for (RendererIterator r = renderers.begin(); r != renderers.end(); r++)
 		{

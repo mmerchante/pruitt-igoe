@@ -13,7 +13,7 @@ void Camera::Awake()
 	this->width = Engine::GetInstance()->GetScreenSize().x;
 	this->height = Engine::GetInstance()->GetScreenSize().y;
     this->nearClip = .1f;
-    this->farClip = 1000000.f;
+    this->farClip = 1000.f;
     this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
 
     Engine::GetInstance()->RegisterCamera(this);
@@ -81,7 +81,7 @@ void UICamera::Awake()
     this->width = Engine::GetInstance()->GetScreenSize().x;
 	this->height = Engine::GetInstance()->GetScreenSize().y;
     this->nearClip = .1f;
-    this->farClip = 1000000.f;
+    this->farClip = 100.f;
     this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
 }
 
@@ -91,5 +91,5 @@ UICamera::~UICamera()
 
 glm::mat4 UICamera::ComputeViewProjectionMatrix()
 {
-    return glm::ortho(0.f, (float)width, 0.f, (float)height, nearClip, farClip) * glm::translate(glm::mat4(1), glm::vec3(0,0,-1)); // We need to offset Z a bit
+    return glm::ortho(0.f, (float)width, 0.f, (float)height, nearClip, farClip) * glm::translate(glm::mat4(1), glm::vec3(0,0,-10)); // We need to offset Z a bit
 }

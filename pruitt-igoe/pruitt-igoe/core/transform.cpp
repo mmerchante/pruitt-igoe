@@ -93,6 +93,13 @@ glm::vec2 Transform::UIGetSize()
     return glm::vec2(scale.x, scale.y);
 }
 
+void Transform::UIScale(float scale)
+{
+	this->scale.x *= scale;	
+	this->scale.y *= scale;
+	UpdateMatrices();
+}
+
 void Transform::UISetLocalPosition(glm::vec2 position)
 {
     SetLocalPosition(glm::vec3(position.x, position.y, this->position.z));

@@ -37,8 +37,8 @@ public:
 		if (t != nullptr)
 			return t;
 
-		t = new T(p);
-		t->LoadFromFilename(id);
+		t = new T();
+		t->LoadFromFilename(id, p);
 		assetMap[typeid(T)][id] = t;
 		return t;
 	}

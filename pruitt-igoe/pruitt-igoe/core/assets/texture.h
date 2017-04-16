@@ -11,7 +11,8 @@ struct TextureParameters
 	GLint wrapS;
 	GLint wrapT;
 
-	TextureParameters() : minFilter(GL_NEAREST), magFilter(GL_NEAREST), wrapS(GL_REPEAT), wrapT(GL_REPEAT) {}
+	TextureParameters() : minFilter(GL_LINEAR), magFilter(GL_LINEAR), wrapS(GL_REPEAT), wrapT(GL_REPEAT) {}
+	TextureParameters(GLint minFilter, GLint magFilter, GLint wrapS, GLint wrapT) : minFilter(minFilter), magFilter(magFilter), wrapS(wrapS), wrapT(wrapT) {}
 };
 
 class Texture : public Asset

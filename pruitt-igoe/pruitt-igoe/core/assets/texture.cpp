@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "../engine.h"
 
 Texture::Texture() : Asset(), textureID(-1), width(0), height(0)
 {
@@ -47,6 +48,11 @@ void Texture::LoadFromRaw(const uint8_t * pixels, int width, int height, const T
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, p.wrapT);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, pixels);
+
+	if (p.minFilter == GL_LINEAR_MIPMAP_LINEAR)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::LoadFromFilename(const std::string& filename)
@@ -58,8 +64,11 @@ void Texture::LoadFromFilename(const std::string & filename, const TextureParame
 {
 	sf::Image image;
 
-	if(!image.loadFromFile(filename))
+	if (!image.loadFromFile(filename))
+	{
+		Engine::LogError("Could not load " + filename);
 		return;
+	}
 		
 	const uint8_t * pixels = image.getPixelsPtr();
 

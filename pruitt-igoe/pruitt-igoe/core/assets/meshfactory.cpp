@@ -43,6 +43,49 @@ Mesh *MeshFactory::BuildQuad(bool writeOnly)
 	return output;
 }
 
+// Similar but from 0,0 to 1,1
+Mesh * MeshFactory::BuildUIQuad(bool writeOnly)
+{
+	int vertexCount = 4;
+	int indicesCunt = 6;
+
+	GLuint * indices = new GLuint[indicesCunt];
+	glm::vec4 * vertices = new glm::vec4[vertexCount];
+	glm::vec2 * UVs = new glm::vec2[vertexCount];
+
+	int index = 0;
+
+	// Vertices are optimized for full screen quad
+	vertices[index++] = glm::vec4(0, 0, 0, 1.0f);
+	vertices[index++] = glm::vec4(1, 0, 0, 1.0f);
+	vertices[index++] = glm::vec4(1, 1, 0, 1.0f);
+	vertices[index++] = glm::vec4(0, 1, 0, 1.0f);
+
+	index = 0;
+	UVs[index++] = glm::vec2(0, 1);
+	UVs[index++] = glm::vec2(1, 1);
+	UVs[index++] = glm::vec2(1, 0);
+	UVs[index++] = glm::vec2(0, 0);
+
+	// Upper side
+	index = 0;
+	indices[index++] = 0;
+	indices[index++] = 1;
+	indices[index++] = 2;
+
+	indices[index++] = 2;
+	indices[index++] = 3;
+	indices[index++] = 0;
+
+	Mesh * output = new Mesh();
+	output->SetIndices(indices, indicesCunt);
+	output->SetVertices(vertices, vertexCount);
+	output->SetUVs(UVs, vertexCount);
+	output->Upload(writeOnly);
+
+	return output;
+}
+
 //
 //static const int CUB_IDX_COUNT = 36;
 //static const int CUB_VERT_COUNT = 24;

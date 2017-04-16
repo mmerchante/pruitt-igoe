@@ -7,8 +7,11 @@
 #include "core\material.h"
 #include "core\gameobject.h"
 #include "core\components\renderer.h"
+#include "core\components\FPSCounter.h"
 #include "core\components\camera.h"
 #include "core\assets\meshfactory.h"
+#include "core\ui\uitext.h"
+#include "core\ui\uiimage.h"
 
 #include <iostream>
 
@@ -50,13 +53,20 @@ int main()
 	material->SetFeature(GL_DEPTH_TEST, false);
 
 	GameObject * quadGO = GameObject::Instantiate("quad");
-
 	ShaderReloader * reloader = quadGO->AddComponent<ShaderReloader>();
 	reloader->material = material;
 
 	MeshRenderer * r = quadGO->AddComponent<MeshRenderer>();
 	r->SetMesh(MeshFactory::BuildQuad(true));
 	r->SetMaterial(material);
+
+	GameObject * titleTest = GameObject::Instantiate("Titles");
+	UIImage * image = titleTest->AddComponent<UIImage>();
+	image->SetTexture("./resources/title.png");	
+	image->GetTransform()->UIScale(.1f);
+	
+	GameObject * fpsCounter = GameObject::Instantiate("fps");
+	fpsCounter->AddComponent<FPSCounter>();
 	
 	engine->Start();
 	

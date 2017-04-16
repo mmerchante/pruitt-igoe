@@ -144,6 +144,10 @@
     <ClCompile Include="core\log.cpp" />
     <ClCompile Include="core\material.cpp" />
     <ClCompile Include="core\transform.cpp" />
+    <ClCompile Include="core\ui\uicomponent.cpp" />
+    <ClCompile Include="core\ui\uiimage.cpp" />
+    <ClCompile Include="core\ui\uitext.cpp" />
+    <ClCompile Include="core\components\FPSCounter.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,8 +168,14 @@
     <ClInclude Include="core\log.h" />
     <ClInclude Include="core\material.h" />
     <ClInclude Include="core\transform.h" />
+    <ClInclude Include="core\ui\uicomponent.h" />
+    <ClInclude Include="core\ui\uiimage.h" />
+    <ClInclude Include="core\ui\uitext.h" />
+    <ClInclude Include="core\components\FPSCounter.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\font.png" />
+    <Image Include="resources\title.png" />
     <Image Include="test.png" />
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +183,8 @@
     <None Include="glsl\flat.vert.glsl" />
     <None Include="glsl\pennFlag.frag.glsl" />
     <None Include="glsl\pennFlag.vert.glsl" />
+    <None Include="glsl\ui.frag.glsl" />
+    <None Include="glsl\ui.vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
