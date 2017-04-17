@@ -11,6 +11,9 @@ class Asset
 public:
     Asset();
 
+	virtual bool ShouldReload();
+	virtual void Reload();
+
     // Not all assets must implement this, but if you want it to be cached you must
     virtual void LoadFromFilename(std::string filename);
     virtual ~Asset();

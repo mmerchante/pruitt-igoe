@@ -1,6 +1,7 @@
 #include "shader.h"
 #include "mesh.h"
 #include "texture.h"
+#include "../material.h"
 #include <iostream>
 #include <fstream>
 #include "../engine.h"
@@ -8,7 +9,7 @@
 const std::string SHADER_BASE_DIRECTORY = "./glsl/";
 
 Shader::Shader() : Asset(), shaderName(""),
-    prog(-1), attrPos(-1), attrNor(-1), attrCol(-1), attrUV(-1), loaded(false)
+    prog(-1), attrPos(-1), attrNor(-1), attrCol(-1), attrUV(-1), loaded(false), lastChecksum(-1)
 {
     vertexFilename = "";
     fragmentFilename = "";
@@ -91,6 +92,27 @@ void Shader::Reload()
 	attrNor = glGetAttribLocation(prog, "vertexNormal");
 	attrCol = glGetAttribLocation(prog, "vertexColor");
 	attrUV = glGetAttribLocation(prog, "vertexUV");
+
+	DispatchReloadEvent();
+}
+
+bool Shader::ShouldReload()
+{
+	if (lastChecksum == -1)
+		return false;
+
+	int vertChecksum = GetFileChecksum(vertexFilename);
+	int fragChecksum = GetFileChecksum(fragmentFilename);
+
+	int sum = vertChecksum + fragChecksum;
+
+	if (sum != lastChecksum)
+	{
+		lastChecksum = sum;
+		return true;
+	}
+
+	return false;
 }
 
 void Shader::Upload()
@@ -107,7 +129,12 @@ void Shader::Upload()
 
 	std::string vertexSource = ReadFile(vertexFilename);
 	std::string fragmentSource = ReadFile(fragmentFilename);
-	
+
+	int vertChecksum = GetFileChecksum(vertexFilename);
+	int fragChecksum = GetFileChecksum(fragmentFilename);
+
+	lastChecksum = vertChecksum + fragChecksum;
+
 	//Engine::LogVerbose("VERTEX SHADER: \n" + vertexSource);
 	//Engine::LogVerbose("FRAGMENT SHADER: \n" + fragmentSource);
 
@@ -232,6 +259,35 @@ void Shader::Render(Mesh *mesh, GLenum drawMode)
     if (attrUV != -1) glDisableVertexAttribArray(attrUV);
 }
 
+void Shader::AddListener(ShaderListener * l)
+{
+	this->listeners.push_back(l);
+}
+
+int Shader::GetFileChecksum(const std::string & filename)
+{
+	std::ifstream in(filename, std::ios::in);
+
+	if (in)
+	{
+		std::string contents;
+		in.seekg(0, std::ios::end);
+		contents.resize(in.tellg());
+		in.seekg(0, std::ios::beg);
+		in.read(&contents[0], contents.size());
+		in.close();
+
+		int sum = 0;
+
+		for (int i = 0; i < contents.size(); i++)
+			sum += contents.data()[i];
+		
+		return sum;
+	}
+
+	return 0;
+}
+
 std::string Shader::ReadFile(const std::string& filename)
 {
 	std::ifstream in(filename, std::ios::in);
@@ -270,6 +326,12 @@ void Shader::PrintShaderInfoLog(int shader)
         std::cout << "ShaderInfoLog:" << std::endl << infoLog << std::endl;
         delete [] infoLog;
     }
+}
+
+void Shader::DispatchReloadEvent()
+{
+	for (int i = 0; i < listeners.size(); i++)
+		listeners[i]->OnShaderReloaded();
 }
 
 int Shader::GetUniformLocation(const char *uniform)

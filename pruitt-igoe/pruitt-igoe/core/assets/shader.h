@@ -6,6 +6,7 @@
 #include <vector>
 
 class Mesh;
+class ShaderListener;
 
 class Shader: public Asset
 {
@@ -19,9 +20,13 @@ public:
 	void Destroy();
 
 	void Reload();
+	bool ShouldReload();
+
     void Upload();
     void Bind();
     void Render(Mesh * mesh, GLenum drawMode);
+
+	void AddListener(ShaderListener * l);
 
     void SetIntUniform(int uniform, int value);
     void SetFloatUniform(int uniform, float value);
@@ -34,8 +39,11 @@ public:
 	int GetUniformLocation(const char *uniform);
 
 protected:
+	int GetFileChecksum(const std::string& filename);
 	std::string ReadFile(const std::string& filename);	
 	void PrintShaderInfoLog(int shader);
+
+	void DispatchReloadEvent();
 	
 private:
 	std::string shaderName;
@@ -50,6 +58,9 @@ private:
 	int attrUV;
 
 	bool loaded;
+	int lastChecksum;
+
+	std::vector<ShaderListener *> listeners;
 };
 
 #endif // SHADER_H

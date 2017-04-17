@@ -12,11 +12,13 @@ class Renderer;
 class UIRenderer;
 class UICamera;
 class Input;
+class ShaderPassComposer;
 
 typedef std::vector<GameObject*>::iterator GameObjectIterator;
 typedef std::vector<Camera*>::iterator CameraIterator;
 typedef std::vector<Renderer*>::iterator RendererIterator;
 typedef std::vector<UIRenderer*>::iterator UIRendererIterator;
+typedef std::vector<ShaderPassComposer*>::iterator PassIterator;
 
 // Basic engine inspired by Unity's entity-component architecture
 class Engine
@@ -34,6 +36,8 @@ public:
 
 	sf::Window * GetWindow();
 
+	void AddShaderComposer(ShaderPassComposer * composer);
+	
     static Engine* GetInstance();
     static Log* GetLog();
     static float Time();
@@ -68,6 +72,7 @@ private:
 	std::vector<GameObject*> gameObjects;
 	std::vector<Camera*> cameras;
 	std::vector<Renderer*> renderers;
+	std::vector<ShaderPassComposer*> composers;
 
 	std::vector<UIRenderer*> uiRenderers;
 	UICamera * uiCamera;

@@ -142,6 +142,7 @@
     <ClCompile Include="core\input.cpp" />
     <ClCompile Include="core\log.cpp" />
     <ClCompile Include="core\material.cpp" />
+    <ClCompile Include="core\ShaderPass.cpp" />
     <ClCompile Include="core\transform.cpp" />
     <ClCompile Include="core\ui\uicomponent.cpp" />
     <ClCompile Include="core\ui\uiimage.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="core\input.h" />
     <ClInclude Include="core\log.h" />
     <ClInclude Include="core\material.h" />
+    <ClInclude Include="core\ShaderPass.h" />
     <ClInclude Include="core\transform.h" />
     <ClInclude Include="core\ui\uicomponent.h" />
     <ClInclude Include="core\ui\uiimage.h" />

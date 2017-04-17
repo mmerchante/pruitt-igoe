@@ -7,6 +7,8 @@
 #include "material.h"
 #include "log.h"
 #include <sstream>
+#include "ShaderPass.h"
+#include "assets\assetdatabase.h"
 
 Engine * Engine::instance = nullptr;
 
@@ -136,11 +138,6 @@ void Engine::Update(float deltaTime)
     this->time += deltaTime;
     this->deltaTime = deltaTime;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-	{
-		LogInfo("keyyyy");
-	}
-
     log->FlushAll();
 
     // Make sure time has passed!
@@ -163,6 +160,8 @@ void Engine::Update(float deltaTime)
 
     // Rendering is independent on time
     Render();
+
+	AssetDatabase::GetInstance()->Update();
 }
 
 bool CompareRenderers(Renderer * lhs, Renderer * rhs)
@@ -176,11 +175,6 @@ void Engine::Render()
 	//std::sort(renderers.begin(), renderers.end(), CompareRenderers);
 
 	glm::ivec2 screenSize = GetScreenSize();
-
-	//Render Objects
-	//glViewport(0, 0, screenSize.x, screenSize.y);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glClearColor(0.1, 0.1, 0.1, 1.0);
 
 	for (CameraIterator c = cameras.begin(); c != cameras.end(); c++)
 	{
@@ -201,8 +195,12 @@ void Engine::Render()
 		camera->FinishRender();
 	}   
 
+	// Render shader passes
+	for (PassIterator p = composers.begin(); p != composers.end(); p++)
+		(*p)->Render();
+
     // Now render the UI
-    //RenderUI();
+    RenderUI();
 }
 
 // This is the main loop
@@ -312,6 +310,11 @@ void Engine::AddLogger(Log *logger)
 sf::Window * Engine::GetWindow()
 {
 	return this->window;
+}
+
+void Engine::AddShaderComposer(ShaderPassComposer * composer)
+{
+	this->composers.push_back(composer);
 }
 
 // Note: NOT thread safe!

@@ -7,7 +7,7 @@ void DemoController::Awake()
 	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(8, 8, 8));
 	this->cameraController->GetTransform()->LookAt(glm::vec3());
 	
-	this->mainQuadMaterial = new Material("minion");
+	this->mainQuadMaterial = new Material("pennFlag");
 	this->mainQuadMaterial->SetFeature(GL_DEPTH_TEST, false);
 
 	this->mainQuad = GameObject::Instantiate("raymarchingQuad");

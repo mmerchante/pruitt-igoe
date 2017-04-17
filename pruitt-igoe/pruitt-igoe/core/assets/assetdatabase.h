@@ -8,6 +8,8 @@
 #include <typeinfo>
 #include <typeindex>
 #include <vector>
+#include <thread>
+#include <mutex>
 
 class AssetDatabase
 {
@@ -55,10 +57,20 @@ public:
         return nullptr;
     }
 
+	void Update();
+	~AssetDatabase();
+
 private:
 	static AssetDatabase * instance;
+	static bool deleted;
 	std::unordered_map<std::type_index, std::unordered_map<std::string, Asset*>> assetMap;
+	std::vector<Asset*> assetsToReload;
+	std::thread updateThread;
+	std::mutex reloadMutex;
+
 	AssetDatabase();
+
+	void WatchAssets();
 };
 
 #endif // ASSETDATABASE_H

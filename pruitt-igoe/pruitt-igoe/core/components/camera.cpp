@@ -68,12 +68,16 @@ float Camera::GetNearClip()
 
 void Camera::Render()
 {
-	if(renderTexture != nullptr)
+	if (renderTexture != nullptr)
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, renderTexture->GetFramebufferID());
+		glViewport(0, 0, renderTexture->GetWidth(), renderTexture->GetHeight());
+	}
 	else
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, width, height);
+		glViewport(0, 0, width, height);
+	}
 
 	int flags = 0;
 	if (clearColor)

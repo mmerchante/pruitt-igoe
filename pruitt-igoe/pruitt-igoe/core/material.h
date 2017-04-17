@@ -8,7 +8,13 @@ class Mesh;
 class Shader;
 class Texture;
 
-class Material
+class ShaderListener
+{
+public:
+	virtual void OnShaderReloaded() = 0;
+};
+
+class Material : public ShaderListener
 {
 public:
     enum RenderingQueue
@@ -106,6 +112,7 @@ protected:
 	template<typename T> void ReloadUniformValue(std::string name, std::unordered_map<std::string, MaterialUniform<T>>& map);
 	template<typename T> void SetUniformValue(std::string name, std::unordered_map<std::string, MaterialUniform<T>>& map, const T& value, bool perObjectUniform, int size);
 
+	virtual void OnShaderReloaded();
 };
 
 
