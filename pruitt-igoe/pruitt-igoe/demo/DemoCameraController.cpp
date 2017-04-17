@@ -37,8 +37,7 @@ void DemoCameraController::Update()
 		this->verticalAngle -= delta.y * sensibility * Engine::DeltaTime();
 		this->horizontalAngle -= delta.x * sensibility * Engine::DeltaTime();
 
-		// Hacky, but SFML is not very flexible with this...
-		sf::Mouse::setPosition(sf::Vector2i(screenCenter.x, screenCenter.y), *Engine::GetInstance()->GetWindow());
+		Engine::CenterMousePosition();
 	}
 	
 	// Clamp vertical angle

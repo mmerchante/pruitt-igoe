@@ -83,6 +83,8 @@ RenderTexture::RenderTexture(int width, int height, bool depth, int precision, T
 	this->width = width;
 	this->height = height;
 	this->parameters = p;
+	this->framebufferID = -1;
+	this->depthbufferID = -1;
 }
 
 RenderTexture::~RenderTexture()

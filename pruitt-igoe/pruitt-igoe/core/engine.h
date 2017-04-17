@@ -45,6 +45,7 @@ public:
 
     static glm::ivec2 GetScreenSize();
     static glm::ivec2 GetCurrentMousePosition();
+	static void CenterMousePosition();
 
     // Simplified logging
     static void LogVerbose(const std::string &str);

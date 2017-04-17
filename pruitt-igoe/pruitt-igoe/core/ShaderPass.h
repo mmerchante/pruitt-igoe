@@ -10,12 +10,13 @@ class Camera;
 class ShaderPass
 {
 public:
-	ShaderPass(const std::string& shaderName, RenderTexture * target, Camera * sourceCamera = nullptr);
+	ShaderPass(const std::string& shaderName, RenderTexture * target = nullptr, Camera * sourceCamera = nullptr);
 	virtual ~ShaderPass();
 
 	// If specific passes need some information updated before render
 	virtual void Update();
 	RenderTexture * Render(Mesh * quad, RenderTexture * source);
+	Material * GetMaterial();
 
 private:
 	RenderTexture * target; // The target buffer of this pass

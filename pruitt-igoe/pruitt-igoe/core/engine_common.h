@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "gameobject.h"
 #include "component.h"
+#include "ShaderPass.h"
 
 #include "components\camera.h"
 #include "components\renderer.h"

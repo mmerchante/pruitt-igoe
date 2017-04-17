@@ -229,6 +229,7 @@ void Engine::Start()
 			if (event.type == sf::Event::MouseEntered)
 			{
 				window->setMouseCursorGrabbed(true);
+				window->setMouseCursorVisible(false);
 				mouseLocked = true;
 			}
 
@@ -236,6 +237,7 @@ void Engine::Start()
 				(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Space))
 			{
 				window->setMouseCursorGrabbed(false);
+				window->setMouseCursorVisible(true);
 				mouseLocked = false;
 			}
 
@@ -352,6 +354,19 @@ glm::ivec2 Engine::GetCurrentMousePosition()
 {
 	sf::Vector2i p = sf::Mouse::getPosition(*GetInstance()->window);
 	return glm::ivec2(p.x, p.y);
+}
+
+void Engine::CenterMousePosition()
+{
+	if (instance == nullptr)
+		return;
+
+	if (instance->mouseLocked)
+	{
+		// Hacky, but SFML is not very flexible with this...
+		glm::vec2 screenCenter = glm::vec2(Engine::GetScreenSize()) * .5f;
+		sf::Mouse::setPosition(sf::Vector2i(screenCenter.x, screenCenter.y), * instance->GetWindow());
+	}
 }
 
 void Engine::LogVerbose(const std::string &str)

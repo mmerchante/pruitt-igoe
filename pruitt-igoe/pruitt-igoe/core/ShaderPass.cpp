@@ -10,6 +10,9 @@ ShaderPass::ShaderPass(const std::string & shaderName, RenderTexture * target, C
 {
 	this->material = new Material(shaderName);
 	this->material->SetFeature(GL_DEPTH_TEST, false);
+
+	if (target)
+		target->Load();
 }
 
 ShaderPass::~ShaderPass()
@@ -28,11 +31,16 @@ void ShaderPass::Update()
 RenderTexture * ShaderPass::Render(Mesh * quad, RenderTexture * source)
 {
 	if (target != nullptr)
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, target->GetFramebufferID());
+		glViewport(0, 0, target->GetWidth(), target->GetHeight());
+	}
 	else
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, target->GetWidth(), target->GetHeight());
+		glm::vec2 screenSize = Engine::GetScreenSize();
+		glViewport(0, 0, screenSize.x, screenSize.y);
+	}
 
 	if(source != nullptr)
 		this->material->SetTexture("SourceTexture", source);
@@ -43,6 +51,11 @@ RenderTexture * ShaderPass::Render(Mesh * quad, RenderTexture * source)
 		this->material->Render(quad, glm::mat4(), glm::mat4(), glm::mat4(), glm::mat4(), Engine::Time());
 
 	return this->target;
+}
+
+Material * ShaderPass::GetMaterial()
+{
+	return this->material;
 }
 
 ShaderPassComposer::ShaderPassComposer()
@@ -61,6 +74,9 @@ void ShaderPassComposer::Render()
 
 	for (int i = 0; i < passes.size(); i++)
 	{
+		if (currentTarget != nullptr)
+			currentTarget->GenerateMipmaps();
+
 		passes[i]->Update();
 		currentTarget = passes[i]->Render(this->quad, currentTarget);
 	}
