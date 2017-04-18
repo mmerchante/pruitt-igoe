@@ -357,14 +357,16 @@ void Shader::SetFloatUniform(int uniform, float value)
         glUniform1f(uniform, value);
 }
 
-void Shader::SetTextureUniform(int uniform, GLuint value)
+void Shader::SetTextureUniform(int uniform, GLuint value, int textureUnit)
 {
     Bind();
 
     if(uniform != -1)
-    {
-        glUniform1i(uniform, 0);
-        glActiveTexture(GL_TEXTURE0);
+    {	
+		GLenum activeTexture = GL_TEXTURE0 + textureUnit;
+
+		glUniform1i(uniform, textureUnit);
+        glActiveTexture(activeTexture);
         glBindTexture(GL_TEXTURE_2D, value);
     }
 }

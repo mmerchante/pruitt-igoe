@@ -105,15 +105,11 @@ GLuint RenderTexture::GetDepthbufferID()
 
 void RenderTexture::Load()
 {
-	// FBO generation
-	glGenFramebuffers(1, &framebufferID);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
-
 	// Texture generation
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, parameters.minFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, parameters.magFilter);
@@ -123,6 +119,10 @@ void RenderTexture::Load()
 	if (parameters.minFilter == GL_LINEAR_MIPMAP_LINEAR || parameters.minFilter == GL_LINEAR_MIPMAP_NEAREST || 
 		parameters.minFilter == GL_NEAREST_MIPMAP_NEAREST || parameters.minFilter == GL_NEAREST_MIPMAP_LINEAR)
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+	// FBO generation
+	glGenFramebuffers(1, &framebufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 
 	// Depth buffer
 	glGenRenderbuffers(1, &depthbufferID);
@@ -136,8 +136,12 @@ void RenderTexture::Load()
 	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, DrawBuffers);
 
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		Engine::LogError("Framebuffer not complete!");
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
 void RenderTexture::GenerateMipmaps()

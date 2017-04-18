@@ -191,5 +191,7 @@
     <None Include="glsl\pass_passthrough.vert.glsl" />
     <None Include="glsl\minKernel.frag.glsl" />
     <None Include="glsl\minKernel.vert.glsl" />
+    <None Include="glsl\terrain.frag.glsl" />
+    <None Include="glsl\terrain.vert.glsl" />
   </ItemGroup>
 </Project>

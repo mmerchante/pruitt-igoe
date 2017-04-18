@@ -22,9 +22,9 @@ int main()
 {
 	Engine * engine = Engine::GetInstance();
 
-	sf::Window * window = new sf::Window(sf::VideoMode(640, 480, 32), "pruitt-igoe");
+	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), "pruitt-igoe", sf::Style::Fullscreen);
 	window->setMouseCursorVisible(false);
-
+	
 	engine->Initialize(window);
 	engine->GetLog()->SetLogLevel(Log::LogLevel::Verbose);
 

@@ -42,6 +42,7 @@ public:
     static Log* GetLog();
     static float Time();
     static float DeltaTime();
+	static void CheckGLError();
 
     static glm::ivec2 GetScreenSize();
     static glm::ivec2 GetCurrentMousePosition();

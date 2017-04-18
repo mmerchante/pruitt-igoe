@@ -343,6 +343,16 @@ float Engine::DeltaTime()
     return GetInstance()->deltaTime;
 }
 
+void Engine::CheckGLError()
+{
+	int error = glGetError();
+
+	if (error != GL_NO_ERROR)
+	{
+		LogError("OpenGL Error: " + std::string((char*)glewGetErrorString(error)) + " (" + std::to_string(error) + ")");
+	}
+}
+
 glm::ivec2 Engine::GetScreenSize()
 {
 	Engine * e = GetInstance();

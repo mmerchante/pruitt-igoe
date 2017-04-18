@@ -34,7 +34,7 @@ public:
     void SetMatrixArrayUniform(int uniform, glm::mat4* matrix, int size);
     void SetVectorUniform(int uniform, const glm::vec4& v);
     void SetIVectorUniform(int uniform, const glm::ivec4 &v);
-    void SetTextureUniform(int uniform, GLuint value);
+    void SetTextureUniform(int uniform, GLuint value, int textureUnit);
 
 	int GetUniformLocation(const char *uniform);
 

@@ -13,5 +13,6 @@
 #include "assets\mesh.h"
 #include "assets\meshfactory.h"
 #include "assets\texture.h"
+#include "assets\assetdatabase.h"
 #include "assets\shader.h"
 #include "material.h"

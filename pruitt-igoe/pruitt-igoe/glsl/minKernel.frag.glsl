@@ -1,6 +1,6 @@
-#version 150
+#version 330
 
-#define COHERENCE
+#define COHERENCE 1
 
 uniform sampler2D SourceTexture;
 uniform float Time;
@@ -17,10 +17,12 @@ void main()
     vec4 tex = textureLod(SourceTexture, uv, 0);
 
 	float d = tex.r;
-	for(int i = 0; i < 1; i++)
+	float d1;
+	//int iterations = 2 + int(tex.b * 3.0);// + int(4.0 - smoothstep(0.0, 1.0, tex.b) * 3.0);
+	for(int i = 1; i < 3; i++)
 	{ 
-		int lod = 0 + i;
-		vec3 pixelSize = vec3(1, -1, 0) * vec3(SourceTextureSize.z, SourceTextureSize.w, 0);
+		int lod = 0;
+		vec3 pixelSize = vec3(i, -i, 0) * vec3(SourceTextureSize.z, SourceTextureSize.w, 0);
 
 		// Cross
 		d = min(d, textureLod(SourceTexture, uv + pixelSize.xz, lod).r);
@@ -33,10 +35,16 @@ void main()
 		d = min(d, textureLod(SourceTexture, uv + pixelSize.xy, lod).r);
 		d = min(d, textureLod(SourceTexture, uv + pixelSize.yy, lod).r);
 		d = min(d, textureLod(SourceTexture, uv + pixelSize.yx, lod).r);
+
+		if(i == 1)
+			d1 = d;
 	}
+
+	//d = mix(d, d1, clamp(tex.b * tex.b, 0.0, 1.0));
+
 #else
-	float d = 0.f;
+	float d = 0.0;
 #endif
 
-    out_Col = vec4(d);
+    out_Col = vec4(d, 0, tex.b, 1.0);
 }

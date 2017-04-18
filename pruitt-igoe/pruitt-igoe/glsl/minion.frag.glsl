@@ -240,7 +240,7 @@ float tracksSDF(vec3 point)
 	float base = singleTrackSDF(point - vec3(0.0, 6.0, -10.0));	
 
 	// Neverending claws
-	point.x = repeatDimension(point.x - mod(5.0, 10.0), 10.0, 30.0);
+	point.x = repeatDimension(point.x - mod(Time, 10.0), 10.0, 30.0);
 	base = min(base, clawSDF(point - vec3(0.0, 6.0, -10.0)));
 	return base;
 }
@@ -486,11 +486,13 @@ void main()
 	float d = FAR_CLIP;
     float iterationCount = 0.0;
     float hitMaterial = 0.0;
+	float bias = 1.f;
 
 #ifdef COHERENCE
-	float previousDistance = texture2D(FeedbackBuffer, vertexData.uv).r;
-	t += previousDistance * 50.f * .9f;
+	vec4 previousFrame = texture2D(FeedbackBuffer, vertexData.uv);
+	t += previousFrame.r * 100.f * .95f;
 	current += ray.direction * t;
+	bias += smoothstep(0.0, 1.0, previousFrame.b) * .125;
 #endif
 
 	for(int j = 0; j < MAX_ITERATIONS; j++)
@@ -500,6 +502,8 @@ void main()
 		if(d < EPSILON)
 			break;
 
+		d *= bias;
+
 		t += d;
 		current += ray.direction * d;
 		iterationCount += 1.0;
@@ -508,34 +512,34 @@ void main()
 			break;
 	}
 
-	//// More details in intersections (similar to a discontinuity reduction)
-	//// This GREATLY improves, for example, the gradient estimation for 
-	//// big discontinuities such as box edges
-	//for(int k = 0; k < SECONDARY_ITERATIONS; k++)
-	//{
-	//	if(t >= FAR_CLIP)
-	//		break;
+	// More details in intersections (similar to a discontinuity reduction)
+	// This GREATLY improves, for example, the gradient estimation for 
+	// big discontinuities such as box edges
+	for(int k = 0; k < SECONDARY_ITERATIONS; k++)
+	{
+		if(t >= FAR_CLIP)
+			break;
 
-	//	d = evaluateSceneSDFSimple(current);
+		d = evaluateSceneSDFSimple(current);
 		
-	//	if(d <= 0.0)
-	//		break;
+		if(d <= 0.0)
+			break;
 
-	//	t += d;
-	//	current += ray.direction * d;
-	//	iterationCount += 1.0;
-	//}
+		t += d;
+		current += ray.direction * d;
+		//iterationCount += 1.0;
+	}
 
 	//color = shade(current, ray, t, hitMaterial);
 
 	//// Gamma correction
 	//color = pow(color, vec3(.45454));
 
-	float normalizedIterations = (iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS));
+	float normalizedIterations = iterationCount / float(MAX_ITERATIONS);
 	vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS));
 	//color = mix(color, debugColor, u_debug);
 
-	t /= 50.f;  
+	t /= 100.f;
 
 	out_Col = vec4(t,0,normalizedIterations, 1.0);
 }

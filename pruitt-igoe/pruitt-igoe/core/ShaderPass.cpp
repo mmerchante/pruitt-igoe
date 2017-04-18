@@ -91,6 +91,8 @@ void ShaderPassComposer::Render()
 		if (currentTarget != nullptr)
 			currentTarget->GenerateMipmaps();
 
+		//glBindTexture(GL_TEXTURE_2D, 0);
+
 		passes[i]->Update();
 		RenderTexture * resultTarget = passes[i]->Render(this->quad, currentTarget);
 
