@@ -18,10 +18,14 @@ public:
 	RenderTexture * Render(Mesh * quad, RenderTexture * source);
 	Material * GetMaterial();
 
+	bool IgnoreTarget();
+	void SetIgnoreTarget(bool ignore);
+
 private:
 	RenderTexture * target; // The target buffer of this pass
 	Material * material;
 	Camera * sourceCamera; // Which projection matrices to send
+	bool ignoreTarget;
 };
 
 class ShaderPassComposer

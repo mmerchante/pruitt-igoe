@@ -13,7 +13,7 @@ public:
 	PerspectiveCamera * camera;
 
 private:
-	glm::vec3 velocity;
+	glm::ivec3 velocity;
 	float speed;
 	float verticalAngle;
 	float horizontalAngle;

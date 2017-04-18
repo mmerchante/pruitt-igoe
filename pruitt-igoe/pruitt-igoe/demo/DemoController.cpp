@@ -9,13 +9,23 @@ void DemoController::Awake()
 
 	ShaderPassComposer * composer = new ShaderPassComposer();
 
+	// Iterative raymarcher
 	glm::vec2 screenSize = Engine::GetScreenSize();
 	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
 	ShaderPass * raymarchingPass = new ShaderPass("minion", raymarchingTarget);
 	mainQuadMaterial = raymarchingPass->GetMaterial();
 	composer->AddPass(raymarchingPass);
 
-	ShaderPass * shadingPass = new ShaderPass("shadingPass");
+	// Copy buffer to feedback buffer
+	RenderTexture * feedbackBuffer = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
+	ShaderPass * copyPass = new ShaderPass("minKernel", feedbackBuffer);
+	copyPass->SetIgnoreTarget(true);
+	composer->AddPass(copyPass);
+
+	mainQuadMaterial->SetTexture("FeedbackBuffer", feedbackBuffer);
+
+	// Shade
+	ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
 	composer->AddPass(shadingPass);
 
 	Engine::GetInstance()->AddShaderComposer(composer);

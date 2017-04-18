@@ -369,6 +369,11 @@ void Engine::CenterMousePosition()
 	}
 }
 
+bool Engine::MouseLocked()
+{
+	return GetInstance()->mouseLocked;
+}
+
 void Engine::LogVerbose(const std::string &str)
 {
     GetInstance()->log->LogLine(Log::Verbose, str);

@@ -4,9 +4,9 @@
 // As for most of these assignments, this is not intended to be a very optimal approach to this algorithm,
 // as I try to be as clear as possible for future reference
 #define FAR_CLIP 1000.0
-#define MAX_ITERATIONS 16
+#define MAX_ITERATIONS 10
 #define SECONDARY_ITERATIONS 3
-#define EPSILON 0.01
+#define EPSILON 0.005
 
 #define NORMAL_ESTIMATION_EPSILON .0075
 
@@ -24,6 +24,8 @@
 // Note: some of the functions are taken from mercury's HG_SDF
 #define saturate(x) clamp(x, 0.0, 1.0)
 
+#define COHERENCE 
+
 struct Ray {
 	vec3 position;
 	vec3 direction;
@@ -39,6 +41,7 @@ struct VertexData
 
 uniform float u_debug;
 uniform float Time;
+uniform sampler2D FeedbackBuffer;
 
 in VertexData vertexData;
 
@@ -237,7 +240,7 @@ float tracksSDF(vec3 point)
 	float base = singleTrackSDF(point - vec3(0.0, 6.0, -10.0));	
 
 	// Neverending claws
-	point.x = repeatDimension(point.x - mod(Time, 10.0), 10.0, 30.0);
+	point.x = repeatDimension(point.x - mod(5.0, 10.0), 10.0, 30.0);
 	base = min(base, clawSDF(point - vec3(0.0, 6.0, -10.0)));
 	return base;
 }
@@ -484,6 +487,12 @@ void main()
     float iterationCount = 0.0;
     float hitMaterial = 0.0;
 
+#ifdef COHERENCE
+	float previousDistance = texture2D(FeedbackBuffer, vertexData.uv).r;
+	t += previousDistance * 50.f * .9f;
+	current += ray.direction * t;
+#endif
+
 	for(int j = 0; j < MAX_ITERATIONS; j++)
 	{
 		evaluateSceneSDF(current, d, hitMaterial);
@@ -499,32 +508,34 @@ void main()
 			break;
 	}
 
-	// More details in intersections (similar to a discontinuity reduction)
-	// This GREATLY improves, for example, the gradient estimation for 
-	// big discontinuities such as box edges
-	for(int k = 0; k < SECONDARY_ITERATIONS; k++)
-	{
-		if(t >= FAR_CLIP)
-			break;
+	//// More details in intersections (similar to a discontinuity reduction)
+	//// This GREATLY improves, for example, the gradient estimation for 
+	//// big discontinuities such as box edges
+	//for(int k = 0; k < SECONDARY_ITERATIONS; k++)
+	//{
+	//	if(t >= FAR_CLIP)
+	//		break;
 
-		d = evaluateSceneSDFSimple(current);
+	//	d = evaluateSceneSDFSimple(current);
 		
-		if(d <= 0.0)
-			break;
+	//	if(d <= 0.0)
+	//		break;
 
-		t += d;
-		current += ray.direction * d;
-		iterationCount += 1.0;
-	}
+	//	t += d;
+	//	current += ray.direction * d;
+	//	iterationCount += 1.0;
+	//}
 
-	color = shade(current, ray, t, hitMaterial);
+	//color = shade(current, ray, t, hitMaterial);
 
-	// Gamma correction
-	color = pow(color, vec3(.45454));
+	//// Gamma correction
+	//color = pow(color, vec3(.45454));
 
-	float normalizedIterations = iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS);
+	float normalizedIterations = (iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS));
 	vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS));
 	//color = mix(color, debugColor, u_debug);
 
-	out_Col = vec4(normalizedIterations, normalizedIterations, normalizedIterations, 1.0);
+	t /= 50.f;  
+
+	out_Col = vec4(t,0,normalizedIterations, 1.0);
 }

@@ -42,8 +42,12 @@ RenderTexture * ShaderPass::Render(Mesh * quad, RenderTexture * source)
 		glViewport(0, 0, screenSize.x, screenSize.y);
 	}
 
-	if(source != nullptr)
+	if (source != nullptr)
+	{
+		glm::vec4 txSize = glm::vec4(source->GetWidth(), source->GetHeight(), 1.f / source->GetWidth(), 1.f / source->GetHeight());
 		this->material->SetTexture("SourceTexture", source);
+		this->material->SetVector("SourceTextureSize", txSize);
+	}
 	
 	if(sourceCamera != nullptr)
 		this->material->Render(quad, sourceCamera->GetViewProjectionMatrix(), glm::mat4(), glm::mat4(), glm::mat4(), Engine::Time());
@@ -56,6 +60,16 @@ RenderTexture * ShaderPass::Render(Mesh * quad, RenderTexture * source)
 Material * ShaderPass::GetMaterial()
 {
 	return this->material;
+}
+
+bool ShaderPass::IgnoreTarget()
+{
+	return ignoreTarget;
+}
+
+void ShaderPass::SetIgnoreTarget(bool ignore)
+{
+	this->ignoreTarget = ignore;
 }
 
 ShaderPassComposer::ShaderPassComposer()
@@ -78,7 +92,13 @@ void ShaderPassComposer::Render()
 			currentTarget->GenerateMipmaps();
 
 		passes[i]->Update();
-		currentTarget = passes[i]->Render(this->quad, currentTarget);
+		RenderTexture * resultTarget = passes[i]->Render(this->quad, currentTarget);
+
+		// If the pass is set to ignore, we just jump to the next pass, but we generate the mipmaps anyway
+		if (passes[i]->IgnoreTarget() && resultTarget != nullptr)
+			resultTarget->GenerateMipmaps();
+		else
+			currentTarget = resultTarget;
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
