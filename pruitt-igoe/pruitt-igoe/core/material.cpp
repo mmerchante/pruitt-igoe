@@ -191,8 +191,8 @@ void Material::SetTexture(std::string name, Texture *texture)
     SetUniformValue(name, textureUniforms, texture, false, 1);
 
 	// Each time we set a texture, we also define its size parameters in case we need to sample at pixel accuracy
-	//glm::vec2 size = glm::vec2(texture->GetWidth(), texture->GetHeight());
-	//SetVector(name + "_Size", glm::vec4(size.x, size.y, 1.f / size.x, 1.f / size.y));
+	glm::vec2 size = glm::vec2(texture->GetWidth(), texture->GetHeight());
+	SetVector(name + "_Size", glm::vec4(size.x, size.y, 1.f / size.x, 1.f / size.y));
 }
 
 void Material::SetCubeTexture(std::string name, GLuint i)

@@ -24,6 +24,7 @@ int main()
 
 	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), "pruitt-igoe", sf::Style::Fullscreen);
 	window->setMouseCursorVisible(false);
+	//window->setVerticalSyncEnabled(true);
 	
 	engine->Initialize(window);
 	engine->GetLog()->SetLogLevel(Log::LogLevel::Verbose);

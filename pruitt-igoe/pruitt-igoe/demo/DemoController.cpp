@@ -5,21 +5,21 @@ void DemoController::Awake()
 {
 	GameObject * raymarchingCamera = GameObject::Instantiate("raymarchingCamera");
 	this->cameraController = raymarchingCamera->AddComponent<DemoCameraController>();
-	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(35, 35, 35));
-	this->cameraController->GetTransform()->LookAt(glm::vec3());
+	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(175, 25, 175));
+	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
 
 	ShaderPassComposer * composer = new ShaderPassComposer();
 
 	// Iterative raymarcher
-	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize()) * glm::vec2(.5f);
-	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
+	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
+	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 	ShaderPass * raymarchingPass = new ShaderPass("terrain", raymarchingTarget);
 	mainQuadMaterial = raymarchingPass->GetMaterial();
 
 	composer->AddPass(raymarchingPass);
 
 	// Copy buffer to feedback buffer
-	RenderTexture * feedbackBuffer = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT));
+	RenderTexture * feedbackBuffer = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 	ShaderPass * copyPass = new ShaderPass("minKernel", feedbackBuffer);
 	copyPass->SetIgnoreTarget(true);
 	composer->AddPass(copyPass);

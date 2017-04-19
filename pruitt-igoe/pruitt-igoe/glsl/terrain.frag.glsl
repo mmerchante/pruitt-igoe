@@ -2,8 +2,10 @@
 
 #define FAR_CLIP 1000.0
 #define MAX_ITERATIONS 5
-#define SECONDARY_ITERATIONS 3
-#define EPSILON 0.005
+#define SECONDARY_ITERATIONS 5
+#define EPSILON .01
+
+#define NORMAL_ESTIMATION_EPSILON 1.4 // TODO: this is dependent on the texture texel size
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -26,9 +28,9 @@ uniform float u_debug;
 uniform float Time;
 
 uniform sampler2D Heightfield;
-uniform sampler2D FeedbackBuffer;
+uniform vec4 Heightfield_Size;
 
-//uniform vec4 Heightfield_Size;
+uniform sampler2D FeedbackBuffer;
 
 in VertexData vertexData;
 
@@ -45,6 +47,12 @@ float smin(float a, float b, float k)
 vec3 palette( float t, vec3 a, vec3 b, vec3 c, vec3 d)
 {
     return saturate(a + b * cos(6.28318 * ( c * t + d)));
+}
+
+float sdCappedCylinder( vec3 p, vec2 h)
+{
+  vec2 d = abs(vec2(length(p.xz),p.y)) - h;
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
 vec3 debugIterations(float factor)
@@ -67,13 +75,15 @@ Ray getRay(vec3 origin, vec3 dir)
 
 float terrainSDF(vec3 point)
 {
-	float h = textureLod(Heightfield, point.xz * .01, 0).r * 20.0;
+	float h = texture2D(Heightfield, point.xz * .005).r * 30.0;
+	float d = (point.y - h);
 
-	return (point.y - h);
+	d = min(d, sdCappedCylinder(point - vec3(35.0, 35.0, 50.0), vec2(1.0, 300.0)));
+
+	return d;
 }
 
 // Assumes minDistance was initialized to FAR_CLIP
-// TODO: add material types
 void evaluateSceneSDF(vec3 point, out float minDistance, out float hitMaterial)
 {	
 	hitMaterial = 0.0;
@@ -109,6 +119,29 @@ vec3 estimateSceneGradient(vec3 point, float epsilon)
 	return normalize(vec3(x,y,z));
 }
 
+vec3 shade(vec3 point, Ray ray, float t)
+{
+	vec3 normal = estimateSceneGradient(point, NORMAL_ESTIMATION_EPSILON );
+
+	vec3 light = vec3(35.0, 35.0, 50.0);
+	vec3 l = light - point;
+
+	float diffuse = clamp(dot(normal, normalize(l)), 0.0, 1.0) * .5 + .5;
+
+	float falloff = 500.0 / pow(length(l) + .001, 2.0);
+	//float shadow = clamp(evaluateShadows(point + normal * SHADOW_OFFSET, l) + .15, 0.0, 1.0);
+
+	//float ao = evaluateAmbientOcclusion(point, normal);
+
+	return vec3(diffuse * falloff);
+}
+
+float SamplePreviousFrame(vec2 uv)
+{
+	float d = min(texture2D(FeedbackBuffer, uv).r, textureLod(FeedbackBuffer, uv, 3).r);	
+	return d;
+}
+
 void main()
 {
 	// Renormalize due to interpolation
@@ -124,11 +157,17 @@ void main()
 	float bias = 1.f;
 
 #ifdef COHERENCE
-	vec4 previousFrame = textureLod(FeedbackBuffer, vertexData.uv, 0);
-	t = previousFrame.r * 100.f * .95;
-	current += ray.direction * t;
-	bias += smoothstep(0.0, 1.0, previousFrame.b) * .1;
+	float previousFrame = SamplePreviousFrame(vertexData.uv);
+	t = previousFrame * 200.f * .95;
+	current += ray.direction * t;	
 #endif
+
+	//if(evaluateSceneSDFSimple(current) < .1)
+	//{
+	//	float rollback = .15;
+	//	current -= ray.direction * t * rollback;
+	//	t *= 1.0 - rollback;
+	//}
 
 	for(int j = 0; j < MAX_ITERATIONS; j++)
 	{
@@ -137,7 +176,7 @@ void main()
 		if(d < EPSILON)
 			break;
 
-		d *= bias;
+		d = clamp(d, .001, .01);
 
 		t += d;
 		current += ray.direction * d;
@@ -147,36 +186,33 @@ void main()
 			break;
 	}
 
-	//// More details in intersections (similar to a discontinuity reduction)
-	//// This GREATLY improves, for example, the gradient estimation for 
-	//// big discontinuities such as box edges
-	//for(int k = 0; k < SECONDARY_ITERATIONS; k++)
-	//{
-	//	if(t >= FAR_CLIP)
-	//		break;
+	float shadeDistance = t * .975;
+	current = ray.position + ray.direction * shadeDistance;	
 
-	//	d = evaluateSceneSDFSimple(current);
+	// More details in intersections (similar to a discontinuity reduction)
+	// This GREATLY improves, for example, the gradient estimation for 
+	// big discontinuities such as box edges
+	for(int k = 0; k < SECONDARY_ITERATIONS; k++)
+	{
+		if(t >= FAR_CLIP)
+			break;
+
+		shadeDistance = evaluateSceneSDFSimple(current);
 	
-	//	if(d <= 0.0)
-	//		break;
+		if(shadeDistance <= 0)
+			break;
 
-	//	t += d;
-	//	current += ray.direction * d;
-	//	//iterationCount += 1.0;
-	//}
+		t += shadeDistance;
+		current += ray.direction * shadeDistance;
+	}
 
-	//color = shade(current, ray, t, hitMaterial);
+	color = shade(current, ray, shadeDistance);
 
-	//// Gamma correction
-	//color = pow(color, vec3(.45454));
+	// Gamma correction
+	color = pow(color, vec3(.45454));
+	
+	t /= 200.f;
 
-	float normalizedIterations = iterationCount / float(MAX_ITERATIONS);
-	vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS + SECONDARY_ITERATIONS));
-	//color = mix(color, debugColor, u_debug);
-
-	t /= 100.f;
-
-	//out_Col = vec4(t,abs(previousFrame.r - t),normalizedIterations, 1.0);
-	out_Col = vec4(t,0,normalizedIterations, 1.0);
+	out_Col = vec4(t,color);
 
 }

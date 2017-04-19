@@ -231,6 +231,7 @@ void Engine::Start()
 				window->setMouseCursorGrabbed(true);
 				window->setMouseCursorVisible(false);
 				mouseLocked = true;
+				CenterMousePosition();
 			}
 
 			if (event.type == sf::Event::MouseLeft ||

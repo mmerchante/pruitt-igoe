@@ -1,6 +1,6 @@
 #version 330
 
-#define COHERENCE 1
+#define COHERENCE
 
 uniform sampler2D SourceTexture;
 uniform float Time;
@@ -39,8 +39,6 @@ void main()
 		if(i == 1)
 			d1 = d;
 	}
-
-	//d = mix(d, d1, clamp(tex.b * tex.b, 0.0, 1.0));
 
 #else
 	float d = 0.0;
