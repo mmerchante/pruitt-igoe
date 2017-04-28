@@ -191,7 +191,6 @@ void Shader::Bind()
 	glUseProgram(prog);
 }
 
-//This function, as its name implies, uses the passed in GL widget
 void Shader::Render(Mesh *mesh, GLenum drawMode)
 {
     Bind();

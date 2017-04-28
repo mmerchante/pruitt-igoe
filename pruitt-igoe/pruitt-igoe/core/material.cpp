@@ -55,7 +55,7 @@ Material::Material(Shader *shader) : blendOperation(BlendOperation(GL_ONE, GL_ZE
     // Default values
     this->featureMap[GL_DEPTH_TEST] = true;
     this->featureMap[GL_BLEND] = false;
-    this->featureMap[GL_CULL_FACE] = false;
+    this->featureMap[GL_CULL_FACE] = true;
 
     // Should check if it exists..
     this->shader = shader;

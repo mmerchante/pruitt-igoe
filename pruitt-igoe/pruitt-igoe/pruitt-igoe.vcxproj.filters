@@ -87,6 +87,9 @@
     <ClCompile Include="core\ShaderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="demo\Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
@@ -164,6 +167,9 @@
     <ClInclude Include="core\ShaderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="demo\Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="test.png">
@@ -193,5 +199,7 @@
     <None Include="glsl\minKernel.vert.glsl" />
     <None Include="glsl\terrain.frag.glsl" />
     <None Include="glsl\terrain.vert.glsl" />
+    <None Include="glsl\diffuse.frag.glsl" />
+    <None Include="glsl\diffuse.vert.glsl" />
   </ItemGroup>
 </Project>

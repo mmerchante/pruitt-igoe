@@ -39,6 +39,18 @@ protected:
 	TextureParameters parameters;
 };
 
+class ReadableTexture : public Texture
+{
+public: 
+	ReadableTexture();
+
+	const uint8_t * GetRawPixels() const;
+	virtual void LoadFromFilename(const std::string& filename, const TextureParameters& p);
+
+protected:
+	uint8_t * pixels;
+};
+
 class RenderTexture : public Texture
 {
 public:

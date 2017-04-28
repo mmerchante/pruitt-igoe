@@ -20,7 +20,12 @@ void DemoCameraController::Update()
 	glm::vec3 right = t->Right();
 	glm::vec3 displacement = right * velocity.x + forward * velocity.z;
 
-	t->SetLocalPosition(t->LocalPosition() + displacement * Engine::DeltaTime() * speed);
+	float multiplier = 1.f;
+	
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
+		multiplier = 4.f;
+
+	t->SetLocalPosition(t->LocalPosition() + displacement * Engine::DeltaTime() * speed * multiplier);
 
 	if (Engine::GetInstance()->GetWindow()->hasFocus() && Engine::MouseLocked())
 	{

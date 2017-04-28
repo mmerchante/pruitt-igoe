@@ -49,6 +49,33 @@ int Mesh::GetVertexCount()
     return vertexCount;
 }
 
+void Mesh::GenerateNormals()
+{
+	glm::vec4 * gNormals = new glm::vec4[this->vertexCount];
+
+	for (int i = 0; i < this->indicesCount; i += 3)
+	{
+		int i1 = indices[i];
+		int i2 = indices[i+1];
+		int i3 = indices[i+2];
+
+		glm::vec4 v1 = vertices[i1];
+		glm::vec4 v2 = vertices[i2];
+		glm::vec4 v3 = vertices[i3];
+
+		glm::vec3 e1 = glm::normalize(glm::vec3(v2 - v1));
+		glm::vec3 e2 = glm::normalize(glm::vec3(v3 - v1));
+		glm::vec4 normal = glm::vec4(glm::normalize(glm::cross(e1, e2)), 0.0);
+
+		gNormals[i1] = normal;
+		gNormals[i2] = normal;
+		gNormals[i3] = normal;
+	}
+
+	this->SetNormals(gNormals, vertexCount, true);
+	delete[] gNormals;
+}
+
 void Mesh::SetIndices(glm::uint *indices, int triangleCount, bool copy)
 {
     this->indicesCount = triangleCount;
@@ -148,49 +175,13 @@ void Mesh::SetUVs(glm::vec2 *UVs, int vertexCount, bool copy)
         Engine::LogError("Uvs and vertices dont match!");*/
 }
 
-//glm::vec4 Mesh::CalculateVertexforScreenQuad(float X, float Y, glm::mat4 InvViewProj)
-//{
-//    glm::vec4 vertex = InvViewProj* glm::vec4(X, Y, 0.9f, 1.0f);
-//
-//    vertex.x = vertex.x / vertex.w;
-//    vertex.y = vertex.y / vertex.w;
-//    vertex.z = vertex.z / vertex.w;
-//    vertex.w = 1.0f;
-//    return vertex;
-//}
-//
-//void Mesh::UpdateForScreenQaud(glm::mat4 invVP, int w, int h)
-//{
-//    float left = -1.0f;
-//    float right = 1.0f;
-//    float top = 1.0f;
-//    float bottom = -1.0f;
-//
-//    // Load the vertex array with data.
-//    glm::vec4 vertex = CalculateVertexforScreenQuad(left, top, invVP);
-//    vertices[1] = glm::vec4(vertex.x, vertex.y, vertex.z, 1.0f);  // Top left.
-//
-//    vertex = CalculateVertexforScreenQuad(right, bottom, invVP);
-//    vertices[3] = glm::vec4(vertex.x, vertex.y, vertex.z, 1.0f); // Bottom right.
-//
-//    vertex = CalculateVertexforScreenQuad(left, bottom, invVP);
-//    vertices[0] = glm::vec4(vertex.x, vertex.y, vertex.z, 1.0f); // Bottom left.
-//
-//    vertex = CalculateVertexforScreenQuad(right, top, invVP);
-//    vertices[2] = glm::vec4(vertex.x, vertex.y, vertex.z, 1.0f);  // Top right.
-//
-//    context->glBindBuffer(GL_ARRAY_BUFFER, bufPos);
-//    context->glBufferSubData(GL_ARRAY_BUFFER, 0, vertexCount * sizeof(glm::vec4), vertices);
-//}
-//
-
 void Mesh::Upload(bool deleteInternal)
 {
     // Create a VBO on our GPU and store its handle in bufIdx
     if(indices != nullptr)
     {
         if(!BindIndices()) {
-            GenerateIndices();
+            GenerateIndicesBuffer();
 			BindIndices();
         }
 
@@ -204,7 +195,7 @@ void Mesh::Upload(bool deleteInternal)
         if(interleavedData != nullptr)
         {
             if(!BindInterleaved()) {
-                GenerateInterleaved();
+                GenerateInterleavedBuffer();
 				BindInterleaved();
             }
 
@@ -215,7 +206,7 @@ void Mesh::Upload(bool deleteInternal)
     {
         if(vertices != nullptr)
         {
-            GenerateVertices();
+            GenerateVerticesBuffer();
 			BindVertices();
             
 			glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glm::vec4), vertices, GL_STATIC_DRAW);
@@ -223,7 +214,7 @@ void Mesh::Upload(bool deleteInternal)
 
         if(normals != nullptr)
         {
-            GenerateNormals();
+            GenerateNormalsBuffer();
 			BindNormals();
 
 			glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glm::vec4), normals, GL_STATIC_DRAW);
@@ -231,7 +222,7 @@ void Mesh::Upload(bool deleteInternal)
 		
         if(colors != nullptr)
         {
-            GenerateColors();
+            GenerateColorsBuffer();
 			BindColors();
 
 			glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glm::vec4), colors, GL_STATIC_DRAW);
@@ -239,7 +230,7 @@ void Mesh::Upload(bool deleteInternal)
 
         if(UVs != nullptr)
         {
-            GenerateUVs();
+            GenerateUVsBuffer();
 			BindUVs();
 			glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glm::vec2), UVs, GL_STATIC_DRAW);
         }
@@ -330,7 +321,7 @@ void Mesh::Validate()
     //Engine::LogDebug("VALID? " + std::to_string(valid));
 }
 
-void Mesh::GenerateIndices()
+void Mesh::GenerateIndicesBuffer()
 {
 	if (!idxBound)
 	{
@@ -339,7 +330,7 @@ void Mesh::GenerateIndices()
 	}
 }
 
-void Mesh::GenerateInterleaved()
+void Mesh::GenerateInterleavedBuffer()
 {
 	if (!interleavedBound)
 	{
@@ -348,7 +339,7 @@ void Mesh::GenerateInterleaved()
 	}
 }
 
-void Mesh::GenerateVertices()
+void Mesh::GenerateVerticesBuffer()
 {
 	if (!posBound)
 	{
@@ -357,7 +348,7 @@ void Mesh::GenerateVertices()
 	}
 }
 
-void Mesh::GenerateNormals()
+void Mesh::GenerateNormalsBuffer()
 {
 	if (!norBound)
 	{
@@ -366,7 +357,7 @@ void Mesh::GenerateNormals()
 	}
 }
 
-void Mesh::GenerateColors()
+void Mesh::GenerateColorsBuffer()
 {
 	if (!colBound)
 	{
@@ -375,7 +366,7 @@ void Mesh::GenerateColors()
 	}
 }
 
-void Mesh::GenerateUVs()
+void Mesh::GenerateUVsBuffer()
 {
 	if (!UVBound)
 	{

@@ -36,6 +36,8 @@ public:
     int GetIndicesCount();
     int GetVertexCount();
 
+	void GenerateNormals();
+
     void SetIndices(glm::uint * indices, int indicesCount, bool copy = false);
     void SetInterleavedData(Vertex * data, int vertexCount, bool copy = false);
 
@@ -84,12 +86,12 @@ private:
 	bool colBound;
 	bool UVBound;
 
-	void GenerateIndices();
-	void GenerateInterleaved();
-	void GenerateVertices();
-	void GenerateNormals();
-	void GenerateColors();
-	void GenerateUVs();
+	void GenerateIndicesBuffer();
+	void GenerateInterleavedBuffer();
+	void GenerateVerticesBuffer();
+	void GenerateNormalsBuffer();
+	void GenerateColorsBuffer();
+	void GenerateUVsBuffer();
 };
 
 #endif // MESH_H

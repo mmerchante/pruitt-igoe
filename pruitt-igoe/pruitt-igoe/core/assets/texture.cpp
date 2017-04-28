@@ -156,3 +156,35 @@ void RenderTexture::GenerateMipmaps()
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
+
+ReadableTexture::ReadableTexture() : Texture()
+{
+}
+
+const uint8_t * ReadableTexture::GetRawPixels() const
+{
+	return pixels;
+}
+
+void ReadableTexture::LoadFromFilename(const std::string & filename, const TextureParameters & p)
+{
+	sf::Image image;
+
+	if (!image.loadFromFile(filename))
+	{
+		Engine::LogError("Could not load " + filename);
+		return;
+	}
+
+	const uint8_t * pixels = image.getPixelsPtr();
+
+	if (!pixels)
+		return;
+	
+	LoadFromRaw(pixels, image.getSize().x, image.getSize().y, p);
+
+	int size = image.getSize().x * image.getSize().y;
+	this->pixels = new uint8_t[size * 4];
+
+	std::memcpy(this->pixels, pixels, size * sizeof(uint8_t) * 4);
+}

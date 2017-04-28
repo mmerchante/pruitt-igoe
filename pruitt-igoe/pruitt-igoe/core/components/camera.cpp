@@ -15,9 +15,9 @@ void Camera::Awake()
     this->viewProjectionMatrix = glm::mat4(1.f);
 	this->width = Engine::GetInstance()->GetScreenSize().x;
 	this->height = Engine::GetInstance()->GetScreenSize().y;
-    this->nearClip = .1f;
-    this->farClip = 1000.f;
-    this->backgroundColor = glm::vec4(.2f, .2f, .2f, 0.f);
+    this->nearClip = 1.f;
+    this->farClip = 500.f;
+    this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
 	this->mask = CullingMask::Default;
 	this->clearColor = true;
 	this->clearDepth = true;
@@ -88,8 +88,9 @@ void Camera::Render()
 
 	if (flags)
 	{
-		glClear(flags);
 		glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.z);
+		glClearDepth(1.f);
+		glClear(flags);
 	}
 }
 

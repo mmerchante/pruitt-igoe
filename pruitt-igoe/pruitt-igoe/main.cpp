@@ -22,7 +22,11 @@ int main()
 {
 	Engine * engine = Engine::GetInstance();
 
-	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), "pruitt-igoe", sf::Style::Fullscreen);
+	sf::ContextSettings window_settings;
+	window_settings.depthBits = 24;
+
+	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), 
+										"pruitt-igoe", sf::Style::Fullscreen, window_settings);	
 	window->setMouseCursorVisible(false);
 	//window->setVerticalSyncEnabled(true);
 	

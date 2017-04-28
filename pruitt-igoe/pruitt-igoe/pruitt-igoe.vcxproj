@@ -152,6 +152,7 @@
     <ClCompile Include="demo\DemoCameraController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="core\components\ShaderReloader.cpp" />
+    <ClCompile Include="demo\Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="demo\DemoController.h" />
     <ClInclude Include="demo\DemoCameraController.h" />
     <ClInclude Include="core\components\ShaderReloader.h" />
+    <ClInclude Include="demo\Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\font.png" />
@@ -186,6 +188,8 @@
     <Image Include="test.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="glsl\diffuse.frag.glsl" />
+    <None Include="glsl\diffuse.vert.glsl" />
     <None Include="glsl\flat.frag.glsl" />
     <None Include="glsl\flat.vert.glsl" />
     <None Include="glsl\minion.vert.glsl" />
