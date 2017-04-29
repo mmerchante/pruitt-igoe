@@ -37,7 +37,7 @@ void DemoCameraController::Update()
 		if (std::fabs(delta.x) < 0.1f && std::fabs(delta.y) < .1f)
 			return;
 
-		float sensibility = .25f;
+		float sensibility = 1.25f;
 
 		this->verticalAngle -= delta.y * sensibility * Engine::DeltaTime();
 		this->horizontalAngle -= delta.x * sensibility * Engine::DeltaTime();

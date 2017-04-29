@@ -5,13 +5,11 @@
 class Terrain : public Component
 {
 public:
-	
 	void Awake();
+	Material * material;
 
 protected:
-
-	Mesh * GenerateMesh(float * heightmap, int width, int height, float scale);
-	Material * material;
+	Mesh * GenerateMesh(float * heightmap, int width, int height, float scale, float resolution);
 	MeshRenderer * renderer;
 };
 

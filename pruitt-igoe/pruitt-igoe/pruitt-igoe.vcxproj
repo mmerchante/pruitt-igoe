@@ -204,6 +204,8 @@
     <None Include="glsl\shadingPass.vert.glsl" />
     <None Include="glsl\terrain.frag.glsl" />
     <None Include="glsl\terrain.vert.glsl" />
+    <None Include="glsl\terrain_envelope.frag.glsl" />
+    <None Include="glsl\terrain_envelope.vert.glsl" />
     <None Include="glsl\ui.frag.glsl" />
     <None Include="glsl\ui.vert.glsl" />
   </ItemGroup>

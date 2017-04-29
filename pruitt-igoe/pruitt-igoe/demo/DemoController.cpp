@@ -9,8 +9,12 @@ void DemoController::Awake()
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
 
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
-	Terrain * terrain = terrainGO->AddComponent<Terrain>();
-	
+	this->terrain = terrainGO->AddComponent<Terrain>();
+
+	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_1.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+
+	terrain->material->SetTexture("Heightfield", heightmap);
+		
 	//ShaderPassComposer * composer = new ShaderPassComposer();
 
 	//// Iterative raymarcher
@@ -27,7 +31,6 @@ void DemoController::Awake()
 	//copyPass->SetIgnoreTarget(true);
 	//composer->AddPass(copyPass);
 
-	//Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_1.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 	//mainQuadMaterial->SetTexture("Heightfield", heightmap);
 	//mainQuadMaterial->SetTexture("FeedbackBuffer", feedbackBuffer);
 	//
@@ -43,4 +46,6 @@ void DemoController::Update()
 	/*this->mainQuadMaterial->SetVector("CameraPosition", glm::vec4(this->cameraController->GetTransform()->WorldPosition(), 1.0));
 	glm::mat4 invProj = glm::inverse(this->cameraController->camera->GetViewProjectionMatrix());
 	this->mainQuadMaterial->SetMatrix("InvViewProjection", invProj);*/
+
+	this->terrain->material->SetVector("CameraPosition", glm::vec4(this->cameraController->GetTransform()->WorldPosition(), 1.0));
 }
