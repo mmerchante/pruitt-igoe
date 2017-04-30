@@ -84,6 +84,43 @@ in VertexData vertexData;
 
 layout(location = 0) out vec4 out_Col;
 
+#ifdef SHADOWS
+// Reference: http://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
+float shadows(vec3 origin, vec3 lightPosition)
+{
+	origin = (ModelInv * vec4(origin.xyz, 1.0)).xyz;
+	lightPosition = (ModelInv * vec4(lightPosition.xyz, 1.0)).xyz;
+	
+	vec3 direction = lightPosition - origin;
+	float maxDistance = length(direction);
+	direction /= maxDistance;
+
+    float t = SHADOW_OFFSET;
+    float soft = .5;
+
+    // WebGL doesnt like loops that cannot be easily unrolled
+	for(int i = 0; i < SHADOW_ITERATIONS; i++)
+	{
+		float d = min(scene(origin + direction * t), maxDistance);
+
+		if(d < SHADOW_EPSILON)
+			break;
+
+		soft = min(soft, SHADOW_SOFT_FACTOR * (d / t));
+
+		//if(t >= maxDistance)
+		//	break;
+
+		t += d;
+	}
+
+	soft = clamp(soft * 2.0, 0.0, 1.0);
+
+	// This is a mix of soft shadows and a fake AO
+	return soft;// + clamp(t * .1, 0.0, 1.0) * (1.0 - soft);
+}
+#endif
+
 void main()
 {
 	vec3 rayOrigin = vertexData.localCameraPosition;

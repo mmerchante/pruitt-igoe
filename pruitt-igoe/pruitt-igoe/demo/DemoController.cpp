@@ -20,7 +20,7 @@ void DemoController::Awake()
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
 	this->terrain = terrainGO->AddComponent<Terrain>();
 
-	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
 	terrain->material->SetTexture("Heightfield", heightmap);
 

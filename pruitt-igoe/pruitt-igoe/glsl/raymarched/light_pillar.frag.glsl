@@ -23,5 +23,7 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	float diffuse = clamp(dot(normal, normalize(l)), 0.0, 1.0) * .95 + .05;
 
 	float falloff = 1500.0 / pow(length(l) + .001, 2.0);
-	return vec3(diffuse * falloff);
+	float rim = pow(dot(normal, -rayDirection), 10.0) + .2;
+
+	return vec3(.4, .5, 1.0) * rim * 4.0; 
 }
