@@ -7,7 +7,7 @@ struct VertexData
 	vec3 wsPos;
 };
 
-uniform mat4 ModelViewProj;
+uniform mat4 ViewProj;
 uniform mat4 Model;
 
 in vec4 vertexPosition;
@@ -19,10 +19,10 @@ out VertexData vertexData;
 void main() 
 {
 	// Inflate the mesh
-	vec4 p = vertexPosition;
-	//p.xyz += vertexNormal.xyz * 4.0f;
+	vec4 p = Model * vertexPosition;
+	p.xyz += vertexNormal.xyz * 4.0f;
 
-	vertexData.wsPos = (Model * p).xyz;
-	vertexData.ssPos = ModelViewProj * p;
+	vertexData.wsPos = p.xyz;
+	vertexData.ssPos = ViewProj * p;
     gl_Position = vertexData.ssPos;
 }

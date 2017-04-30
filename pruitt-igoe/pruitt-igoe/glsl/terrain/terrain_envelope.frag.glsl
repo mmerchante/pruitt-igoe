@@ -1,7 +1,7 @@
 #version 450
 
 #define FAR_CLIP 500.0
-#define MAX_ITERATIONS 10
+#define MAX_ITERATIONS 100
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .01
 

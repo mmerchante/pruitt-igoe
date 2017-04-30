@@ -201,7 +201,9 @@
     <None Include="glsl\terrain.vert.glsl" />
     <None Include="glsl\diffuse.frag.glsl" />
     <None Include="glsl\diffuse.vert.glsl" />
-    <None Include="glsl\terrain_envelope.frag.glsl" />
-    <None Include="glsl\terrain_envelope.vert.glsl" />
+    <None Include="glsl\terrain\terrain_envelope.frag.glsl" />
+    <None Include="glsl\terrain\terrain_envelope.vert.glsl" />
+    <None Include="glsl\terrain\wireframe.vert.glsl" />
+    <None Include="glsl\terrain\wireframe.frag.glsl" />
   </ItemGroup>
 </Project>

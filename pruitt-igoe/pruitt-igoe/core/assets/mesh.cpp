@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include <unordered_map>
 
 Mesh::Mesh() : Asset(), interleaved(false), vertexCount(0), indicesCount(0),
     indices(nullptr), interleavedData(nullptr), vertices(nullptr), normals(nullptr), colors(nullptr), UVs(nullptr),
@@ -51,7 +52,14 @@ int Mesh::GetVertexCount()
 
 void Mesh::GenerateNormals()
 {
-	glm::vec4 * gNormals = new glm::vec4[this->vertexCount];
+	glm::vec4 * gNormals = new glm::vec4[this->vertexCount];	
+	int * count = new int[this->vertexCount];
+
+	for (int i = 0; i < vertexCount; i++)
+	{
+		gNormals[i] = glm::vec4();
+		count[i] = 0;
+	}
 
 	for (int i = 0; i < this->indicesCount; i += 3)
 	{
@@ -67,10 +75,18 @@ void Mesh::GenerateNormals()
 		glm::vec3 e2 = glm::normalize(glm::vec3(v3 - v1));
 		glm::vec4 normal = glm::vec4(glm::normalize(glm::cross(e1, e2)), 0.0);
 
-		gNormals[i1] = normal;
-		gNormals[i2] = normal;
-		gNormals[i3] = normal;
+		count[i1]++;
+		count[i2]++;
+		count[i3]++;
+
+		gNormals[i1] += normal;
+		gNormals[i2] += normal;
+		gNormals[i3] += normal;
 	}
+
+	// Average all contributions
+	for (int i = 0; i < vertexCount; i++)
+		gNormals[i] /= (float)count[i];
 
 	this->SetNormals(gNormals, vertexCount, true);
 	delete[] gNormals;
