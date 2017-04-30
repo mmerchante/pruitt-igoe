@@ -16,7 +16,7 @@ void Camera::Awake()
 	this->width = Engine::GetInstance()->GetScreenSize().x;
 	this->height = Engine::GetInstance()->GetScreenSize().y;
     this->nearClip = 1.f;
-    this->farClip = 500.f;
+    this->farClip = 1000.f;
     this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
 	this->mask = CullingMask::Default;
 	this->clearColor = true;

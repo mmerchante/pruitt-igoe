@@ -10,14 +10,15 @@ void DemoController::Awake()
 
 	GameObject * raymarchingCamera = GameObject::Instantiate("raymarchingCamera");
 	this->cameraController = raymarchingCamera->AddComponent<DemoCameraController>();
-	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(175, 25, 175));
+	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(1024, 64, 512));
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
 	this->cameraController->camera->SetRenderTexture(raymarchingTarget);
+	this->cameraController->camera->backgroundColor = glm::vec4(.4, .5, .6, 1.0);
 
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
 	this->terrain = terrainGO->AddComponent<Terrain>();
 
-	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_1.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
 	terrain->material->SetTexture("Heightfield", heightmap);
 

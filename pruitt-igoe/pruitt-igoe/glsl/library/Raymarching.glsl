@@ -119,10 +119,6 @@ void main()
 #ifdef DEBUG
 		iterationCount += 1.0;
 #endif
-
-		// Far clip
-		if(t >= CameraParameters.y)
-			break;
 	}
 
 	if(hit)
@@ -153,7 +149,10 @@ void main()
 		t = length(CameraPosition.xyz - current);
 		normal = normalize((ModelInvTr * vec4(normal, 0.0)).xyz);
 
-		color = shade(current, normal, rayOrigin, rayDir, t);
+		color = shade(current, normal, CameraPosition.xyz, normalize(current - CameraPosition.xyz), t);
+
+		// Gamma correction
+		color = pow(color, vec3(.45454));
 		out_Col = vec4(color, 1.0);
 #endif
 	}

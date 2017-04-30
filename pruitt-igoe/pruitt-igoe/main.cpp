@@ -26,7 +26,7 @@ int main()
 	window_settings.depthBits = 24;
 
 	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), 
-										"pruitt-igoe", sf::Style::Fullscreen, window_settings);	
+										"pruitt-igoe", sf::Style::Default, window_settings);	
 	window->setMouseCursorVisible(false);
 	//window->setVerticalSyncEnabled(true);
 	

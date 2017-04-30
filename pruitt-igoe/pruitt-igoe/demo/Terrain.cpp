@@ -4,9 +4,9 @@
 
 void Terrain::Awake()
 {
-	ReadableTexture * heightmap = AssetDatabase::GetInstance()->LoadAsset<ReadableTexture>("resources/heightfield_1.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	ReadableTexture * heightmap = AssetDatabase::GetInstance()->LoadAsset<ReadableTexture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
-	int resolution = 16;
+	int resolution = 64;
 	int width = heightmap->GetWidth() / resolution;
 	int height = heightmap->GetHeight() / resolution;
 
@@ -28,17 +28,19 @@ void Terrain::Awake()
 		hpHeightmap[i] = (float)heightmap->GetRawPixels()[srcIndex * 4];
 	}
 
-	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, 64.f, resolution);
+	float verticalScale = 300.f;
+	float scale = .5f;
+	
+	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolution);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
 	this->renderer->SetMesh(terrainMesh);
 	this->material = new Material("terrain/terrain_envelope");
 	this->renderer->SetMaterial(material);
 
-	this->GetTransform()->SetLocalRotation(glm::vec3(0, -glm::radians(45.f), 0));
-	//this->GetTransform()->SetLocalPosition(glm::vec3(100, 0, 0));
 	// Match the raymarched terrain with the mesh
+	this->GetTransform()->SetLocalScale(glm::vec3(scale, 1.f, scale));
 	//this->GetTransform()->SetLocalScale(glm::vec3(heightmap->GetWidth(), 1, heightmap->GetHeight()));
-	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmap->GetWidth(), 64.f, 1.f / heightmap->GetHeight(), 0.f));
+	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmap->GetWidth(), verticalScale, 1.f / heightmap->GetHeight(), 0.f));
 
 	if (SHOW_WIREFRAME)
 	{
