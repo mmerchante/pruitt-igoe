@@ -29,6 +29,9 @@ public:
 	float GetFarClip();
 	float GetNearClip();
 
+	void SetFarClip(float farClip);
+	void SetNearClip(float nearClip);
+
 	void Render();
 	void FinishRender();
 	bool Cull(int layer);

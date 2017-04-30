@@ -3,7 +3,7 @@
 #define MAX_ITERATIONS 400
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .05
-#define NORMAL_ESTIMATION_EPSILON 2.0
+#define NORMAL_ESTIMATION_EPSILON 3.0
 
 //#define DEBUG
 
@@ -21,23 +21,26 @@ float scene(vec3 point)
 
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 {
-	float steepness = pow(abs(normal.y), 10.0);
-
+	float steepness = saturate(pow(abs(normal.y), 10.0));
+	float snow = saturate(smoothstep(200.0 * (1.0 - steepness), 300.0, point.y));
 
 	vec3 lightDirection = normalize(vec3(-1.0, 1.0, -1.0));
 	float cosTheta = dot(normal, lightDirection);
 
 	vec3 refl = reflect(normal, rayDirection);
-
 	float rim = pow(1.0 - dot(rayDirection, -normal), 5.0);
 
 	float diffuse = saturate(cosTheta) * .7;
-	float ambient = .05f + rim * .05;
-	float specular = pow(saturate(dot(refl, lightDirection)), 2.0) * (1.0 - steepness) * .25 * diffuse;
+	float ambient = .04f + rim * .075 + saturate(-cosTheta) * .03;
+	float specular = pow(saturate(dot(refl, lightDirection)), 2.0) * (1.0 - steepness) * .1 * diffuse;
 
-	vec3 amb = vec3(.4, .5, .8);
-	vec3 terrainColor = vec3(.25, .3, .08) * .35;
-	terrainColor = mix(vec3(.125, .05, 0) * .1, terrainColor, steepness);	
+	vec3 amb = vec3(.2, .5, .9);
+	vec3 terrainColor = vec3(.25, .3, .08) * .05;
+	terrainColor = mix(vec3(.1, .05, 0) * .03, terrainColor, steepness);	
+	terrainColor = mix(terrainColor, vec3(.8, .8, 1.0) * .1, snow);
 
-	return terrainColor * diffuse * 8.0 + amb * specular + (amb * ambient * ((t / 250)));// vec3(diffuse);
+	
+	vec3 outColor = terrainColor * diffuse * 20.0 + amb * specular + amb * ambient;
+
+	return mix(outColor, amb, saturate(-.2 + t / 2000.0));
 }

@@ -71,6 +71,18 @@ float Camera::GetNearClip()
 	return nearClip;
 }
 
+void Camera::SetFarClip(float farClip)
+{
+	this->farClip = farClip;
+	PhysicsUpdate();
+}
+
+void Camera::SetNearClip(float nearClip)
+{
+	this->nearClip = nearClip;
+	PhysicsUpdate();
+}
+
 void Camera::Render()
 {
 	if (renderTexture != nullptr)

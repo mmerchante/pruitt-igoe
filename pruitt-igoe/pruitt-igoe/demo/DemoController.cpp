@@ -13,7 +13,9 @@ void DemoController::Awake()
 	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(1024, 64, 512));
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
 	this->cameraController->camera->SetRenderTexture(raymarchingTarget);
-	this->cameraController->camera->backgroundColor = glm::vec4(.4, .5, .6, 1.0);
+	this->cameraController->camera->backgroundColor = glm::pow(glm::vec4(.2, .5, .9, 1.0), glm::vec4(.45454f));
+	this->cameraController->camera->SetFarClip(2000);
+	this->cameraController->camera->SetNearClip(10);
 
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
 	this->terrain = terrainGO->AddComponent<Terrain>();
@@ -26,7 +28,7 @@ void DemoController::Awake()
 	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
 	pillarRenderer->SetMesh(MeshFactory::BuildCube(true, true));
 	pillarRenderer->GetTransform()->SetLocalScale(glm::vec3(10.f, 1000.f, 10.f));
-	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(35.f, 500.f, 50.f));
+	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(512, 64, 512));
 
 	Material * pillarMaterial = new Material("raymarched/light_pillar");
 	//pillarMaterial->SetFeature(GL_CULL_FACE, false);
