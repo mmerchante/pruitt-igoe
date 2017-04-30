@@ -22,6 +22,7 @@ struct VertexData
 
 uniform vec4 CameraPosition;
 uniform vec4 CameraParameters;
+uniform vec4 TerrainScale;
 
 uniform float u_debug;
 uniform float Time;
@@ -74,10 +75,10 @@ Ray getRay(vec3 origin, vec3 dir)
 
 float terrainSDF(vec3 point)
 {
-	float h = texture2D(Heightfield, point.xz * .002).r * 64.0;
+	float h = texture2D(Heightfield, point.xz * TerrainScale.xz).r * TerrainScale.y;
 	float d = (point.y - h);
 
-	//d = min(d, sdCappedCylinder(point - vec3(35.0, 35.0, 50.0), vec2(1.0, 300.0)));
+	d = min(d, sdCappedCylinder(point - vec3(35.0, 35.0, 50.0), vec2(1.0, 300.0)));
 
 	return d;
 }

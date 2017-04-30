@@ -28,13 +28,15 @@ void Terrain::Awake()
 		hpHeightmap[i] = (float)heightmap->GetRawPixels()[srcIndex * 4];
 	}
 
-	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, 0.25f, resolution);
+	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, 1.f, resolution);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
 	this->renderer->SetMesh(terrainMesh);
 	this->material = new Material("terrain/terrain_envelope");
 	this->renderer->SetMaterial(material);
 
-	this->GetTransform()->SetLocalScale(glm::vec3(width, 1.f, height));
+	// Match the raymarched terrain with the mesh
+	this->GetTransform()->SetLocalScale(glm::vec3(width, 64, height));
+	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmap->GetWidth(), 64.f, 1.f / heightmap->GetHeight(), 0.f));
 
 	if (SHOW_WIREFRAME)
 	{
@@ -66,7 +68,8 @@ Mesh * Terrain::GenerateMesh(float * heightmap, int width, int height, float sca
 	{
 		for (int x = 0; x < width; x++)
 		{
-			float h = heightmap[y * width + x] * scale;
+			float h = heightmap[y * width + x] * scale / 255.f;
+
 			glm::vec4 v = glm::vec4(x, h, y, 1.f);
 			glm::vec2 uv = glm::vec2(x, y + 1) * pixelSize;
 
