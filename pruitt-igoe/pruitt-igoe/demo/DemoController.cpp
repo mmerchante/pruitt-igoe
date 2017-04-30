@@ -3,10 +3,16 @@
 
 void DemoController::Awake()
 {
+	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
+	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	//raymarchingTarget->AddDrawBuffer(GL_DEPTH_ATTACHMENT);
+	raymarchingTarget->Load();
+
 	GameObject * raymarchingCamera = GameObject::Instantiate("raymarchingCamera");
 	this->cameraController = raymarchingCamera->AddComponent<DemoCameraController>();
 	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(175, 25, 175));
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
+	this->cameraController->camera->SetRenderTexture(raymarchingTarget);
 
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
 	this->terrain = terrainGO->AddComponent<Terrain>();
@@ -15,11 +21,11 @@ void DemoController::Awake()
 
 	terrain->material->SetTexture("Heightfield", heightmap);
 		
-	//ShaderPassComposer * composer = new ShaderPassComposer();
+	ShaderPassComposer * composer = new ShaderPassComposer();
+	composer->SetSourceTarget(raymarchingTarget);
 
 	//// Iterative raymarcher
-	//glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
-	//RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	
 	//ShaderPass * raymarchingPass = new ShaderPass("terrain", raymarchingTarget);
 	//mainQuadMaterial = raymarchingPass->GetMaterial();
 
@@ -33,12 +39,12 @@ void DemoController::Awake()
 
 	//mainQuadMaterial->SetTexture("Heightfield", heightmap);
 	//mainQuadMaterial->SetTexture("FeedbackBuffer", feedbackBuffer);
-	//
-	//// Shade
-	//ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
-	//composer->AddPass(shadingPass);
+	
+	// Shade
+	ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
+	composer->AddPass(shadingPass);
 
-	//Engine::GetInstance()->AddShaderComposer(composer);
+	Engine::GetInstance()->AddShaderComposer(composer);
 }
 
 void DemoController::Update()

@@ -60,12 +60,14 @@ public:
 	GLuint GetFramebufferID();
 	GLuint GetDepthbufferID();
 
+	void AddDrawBuffer(GLenum buffer);
 	void Load();
 	void GenerateMipmaps();
 
 protected:
 	GLuint framebufferID;
 	GLuint depthbufferID;
+	std::vector<GLenum> drawBuffers;
 	bool depth;
 	int precision;
 };

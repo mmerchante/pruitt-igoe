@@ -41,12 +41,12 @@ void MeshRenderer::Awake()
     this->mesh = nullptr;
 }
 
-void MeshRenderer::Render(const glm::mat4 &viewProj)
+void MeshRenderer::Render(const glm::mat4 &viewProj, const glm::vec4& cameraParameters)
 {
     if(this->material != nullptr && this->mesh != nullptr)
     {
         Transform * t = this->gameObject->GetTransform();
-        this->material->Render(mesh, viewProj, t->LocalToWorldMatrix(), t->WorldToLocalMatrix(), t->InverseTransposeMatrix(), Engine::Time());
+        this->material->Render(mesh, viewProj, cameraParameters, t->LocalToWorldMatrix(), t->WorldToLocalMatrix(), t->InverseTransposeMatrix(), Engine::Time());
     }
 }
 
@@ -63,11 +63,11 @@ UIRenderer::~UIRenderer()
     Engine::GetInstance()->DeregisterUIRenderer(this);
 }
 
-void UIRenderer::Render(const glm::mat4 &viewProj)
+void UIRenderer::Render(const glm::mat4 &viewProj, const glm::vec4& cameraParameters)
 {
     if(this->material != nullptr && this->mesh != nullptr)
     {
         Transform * t = this->gameObject->GetTransform();
-        this->material->Render(mesh, viewProj, t->LocalToWorldMatrix(), t->WorldToLocalMatrix(), t->InverseTransposeMatrix(), Engine::Time());
+        this->material->Render(mesh, viewProj, glm::vec4(), t->LocalToWorldMatrix(), t->WorldToLocalMatrix(), t->InverseTransposeMatrix(), Engine::Time());
     }
 }

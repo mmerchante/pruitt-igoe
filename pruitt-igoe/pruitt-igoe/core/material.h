@@ -39,7 +39,7 @@ public:
     Shader * GetShader();
 	void Reload();
 
-    void Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime);
+    void Render(Mesh * mesh, const glm::mat4& viewProj, const glm::vec4& cameraParameters, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime);
 
     void SetInt(std::string name, int i);
     void SetFloat(std::string name, float f);

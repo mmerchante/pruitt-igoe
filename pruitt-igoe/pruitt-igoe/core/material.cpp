@@ -13,6 +13,7 @@ const std::string VIEW_PROJ_UNIFORM = "ViewProj";
 const std::string MODEL_VIEW_PROJECTION_UNIFORM = "ModelViewProj";
 const std::string TIME_UNIFORM = "Time";
 const std::string SCREEN_SIZE = "ScreenSize";
+const std::string CAMERA_PARAMETERS = "CameraParameters";
 
 void Material::PrepareCoreUniforms()
 {
@@ -24,7 +25,9 @@ void Material::PrepareCoreUniforms()
     SetUniformValue(VIEW_PROJ_UNIFORM, matrixUniforms, glm::mat4(), true, 1);
 
 	SetUniformValue(TIME_UNIFORM, floatUniforms, 0.f, true, 1);
+
 	SetUniformValue(SCREEN_SIZE, vectorUniforms, glm::vec4(0), true, 1);
+	SetUniformValue(CAMERA_PARAMETERS, vectorUniforms, glm::vec4(0), true, 1);
 }
 
 const std::string Material::GetUniformName(std::string baseName)
@@ -79,7 +82,7 @@ void Material::Reload()
 	this->shader->Reload();
 }
 
-void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime)
+void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::vec4& cameraParameters, const glm::mat4 &localToWorld, const glm::mat4 &worldToLocal, const glm::mat4 &invTranspose, float currentTime)
 {
     // Important stuff manually, to prevent copying matrices all the time
     shader->SetMatrixUniform(matrixUniforms[MODEL_UNIFORM].id, localToWorld);
@@ -91,6 +94,7 @@ void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::mat4 &l
 	
 	glm::vec2 screenSize = Engine::GetScreenSize();
 	shader->SetVectorUniform(vectorUniforms[SCREEN_SIZE].id, glm::vec4(screenSize.x, screenSize.y, 1.f / screenSize.x, 1.f / screenSize.y));
+	shader->SetVectorUniform(vectorUniforms[CAMERA_PARAMETERS].id, cameraParameters);
 
     // Send int uniforms!
     for(IntUniformIterator v = intUniforms.begin(); v != intUniforms.end(); v++)

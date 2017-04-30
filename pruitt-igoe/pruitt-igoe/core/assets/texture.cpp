@@ -85,6 +85,8 @@ RenderTexture::RenderTexture(int width, int height, bool depth, int precision, T
 	this->parameters = p;
 	this->framebufferID = -1;
 	this->depthbufferID = -1;
+
+	this->AddDrawBuffer(GL_COLOR_ATTACHMENT0);
 }
 
 RenderTexture::~RenderTexture()
@@ -101,6 +103,11 @@ GLuint RenderTexture::GetFramebufferID()
 GLuint RenderTexture::GetDepthbufferID()
 {
 	return depthbufferID;
+}
+
+void RenderTexture::AddDrawBuffer(GLenum buffer)
+{
+	this->drawBuffers.push_back(buffer);
 }
 
 void RenderTexture::Load()
@@ -132,9 +139,7 @@ void RenderTexture::Load()
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureID, 0);
 
-	// TODO: MRT if needed
-	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, DrawBuffers);
+	glDrawBuffers(this->drawBuffers.size(), this->drawBuffers.data());
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		Engine::LogError("Framebuffer not complete!");

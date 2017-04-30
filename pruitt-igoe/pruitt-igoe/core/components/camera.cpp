@@ -56,6 +56,11 @@ const glm::vec3 Camera::GetViewVector()
     return  trans->Forward();
 }
 
+const glm::vec4 Camera::GetCameraParameters()
+{
+	return glm::vec4(this->nearClip, this->farClip, 0.f, 0.f);
+}
+
 float Camera::GetFarClip()
 {
 	return farClip;

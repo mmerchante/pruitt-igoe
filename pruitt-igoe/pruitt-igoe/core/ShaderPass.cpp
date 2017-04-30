@@ -50,9 +50,9 @@ RenderTexture * ShaderPass::Render(Mesh * quad, RenderTexture * source)
 	}
 	
 	if(sourceCamera != nullptr)
-		this->material->Render(quad, sourceCamera->GetViewProjectionMatrix(), glm::mat4(), glm::mat4(), glm::mat4(), Engine::Time());
+		this->material->Render(quad, sourceCamera->GetViewProjectionMatrix(), sourceCamera->GetCameraParameters(), glm::mat4(), glm::mat4(), glm::mat4(), Engine::Time());
 	else
-		this->material->Render(quad, glm::mat4(), glm::mat4(), glm::mat4(), glm::mat4(), Engine::Time());
+		this->material->Render(quad, glm::mat4(), glm::vec4(), glm::mat4(), glm::mat4(), glm::mat4(), Engine::Time());
 
 	return this->target;
 }
@@ -90,8 +90,6 @@ void ShaderPassComposer::Render()
 	{
 		if (currentTarget != nullptr)
 			currentTarget->GenerateMipmaps();
-
-		//glBindTexture(GL_TEXTURE_2D, 0);
 
 		passes[i]->Update();
 		RenderTexture * resultTarget = passes[i]->Render(this->quad, currentTarget);

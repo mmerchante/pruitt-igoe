@@ -96,7 +96,7 @@ void Engine::RenderUI()
         UIRenderer * renderer = *r;
 
         if (renderer->GetGameObject()->IsEnabledInHierarchy() && renderer->IsEnabled())
-            renderer->Render(viewProj);
+            renderer->Render(viewProj, glm::vec4());
     }
 }
 
@@ -189,7 +189,7 @@ void Engine::Render()
 			Renderer * renderer = *r;
 
             if (renderer->GetGameObject()->IsEnabledInHierarchy() && !camera->Cull(renderer->GetGameObject()->GetLayer()) && renderer->IsEnabled())
-                renderer->Render(viewProj);
+                renderer->Render(viewProj, camera->GetCameraParameters());
 		}
 
 		camera->FinishRender();

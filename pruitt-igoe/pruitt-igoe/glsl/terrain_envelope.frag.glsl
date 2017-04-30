@@ -1,11 +1,11 @@
 #version 450
 
 #define FAR_CLIP 500.0
-#define MAX_ITERATIONS 5
+#define MAX_ITERATIONS 10
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .01
 
-#define NORMAL_ESTIMATION_EPSILON 1.4 // TODO: this is dependent on the texture texel size
+#define NORMAL_ESTIMATION_EPSILON 2.4 // TODO: this is dependent on the texture texel size
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -21,6 +21,7 @@ struct VertexData
 };
 
 uniform vec4 CameraPosition;
+uniform vec4 CameraParameters;
 
 uniform float u_debug;
 uniform float Time;
@@ -124,14 +125,14 @@ vec3 shade(vec3 point, Ray ray, float t)
 	vec3 light = vec3(35.0, 35.0, 50.0);
 	vec3 l = light - point;
 
-	float diffuse = clamp(dot(normal, normalize(l)), 0.0, 1.0) * .5 + .5;
+	float diffuse = clamp(dot(normal, normalize(l)), 0.0, 1.0) * .75 + .15;
 
-	float falloff = 500.0 / pow(length(l) + .001, 2.0);
+	float falloff = 1500.0 / pow(length(l) + .001, 2.0);
 	//float shadow = clamp(evaluateShadows(point + normal * SHADOW_OFFSET, l) + .15, 0.0, 1.0);
 
 	//float ao = evaluateAmbientOcclusion(point, normal);
 
-	return normal;// vec3(diffuse * falloff);
+	return vec3(diffuse * falloff);
 }
 
 float SamplePreviousFrame(vec2 uv)
@@ -154,47 +155,57 @@ void main()
     vec3 current = ray.position + ray.direction * depth;
 
     float t = depth;
-	float d = FAR_CLIP;
+	float d = CameraParameters.y;
     float iterationCount = 0.0;
     float hitMaterial = 0.0;
+	bool hit = false;
 
 	for(int j = 0; j < MAX_ITERATIONS; j++)
 	{
 		evaluateSceneSDF(current, d, hitMaterial);
 
 		if(d < EPSILON)
+		{
+			hit = true;
 			break;
+		}
 
 		t += d;
 		current += ray.direction * d;
 		iterationCount += 1.0;
 
-		if(t >= FAR_CLIP)
+		if(t >= CameraParameters.y)
 			break;
 	}
 
-	//// More details in intersections (similar to a discontinuity reduction)
-	//// This GREATLY improves, for example, the gradient estimation for 
-	//// big discontinuities such as box edges
-	//for(int k = 0; k < SECONDARY_ITERATIONS; k++)
-	//{
-	//	if(t >= FAR_CLIP)
-	//		break;
+	if(hit)
+	{
+		// More details in intersections (similar to a discontinuity reduction)
+		for(int k = 0; k < SECONDARY_ITERATIONS; k++)
+		{
+			if(t >= FAR_CLIP)
+				break;
 
-	//	d = evaluateSceneSDFSimple(current);
+			d = evaluateSceneSDFSimple(current);
 	
-	//	if(d <= 0)
-	//		break;
+			if(d <= 0)
+				break;
 
-	//	t += d;
-	//	current += ray.direction * d;
-	//}
+			t += d;
+			current += ray.direction * d;
+		}
+	}
 
 	color = shade(current, ray, t);
 
 	// Gamma correction
-	//color = pow(color, vec3(.45454));
+	color = pow(color, vec3(.45454));
 	vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS));
 
 	out_Col = vec4(color, 1.0);
+
+	if(!hit)
+		t = CameraParameters.y;
+
+	gl_FragDepth = (t - CameraParameters.x) / (CameraParameters.y - CameraParameters.x);
 }
