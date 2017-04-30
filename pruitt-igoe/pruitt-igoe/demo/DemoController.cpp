@@ -13,7 +13,7 @@ void DemoController::Awake()
 	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(1024, 64, 512));
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
 	this->cameraController->camera->SetRenderTexture(raymarchingTarget);
-	this->cameraController->camera->backgroundColor = glm::pow(glm::vec4(.2, .5, .9, 1.0), glm::vec4(.45454f));
+	this->cameraController->camera->backgroundColor = glm::vec4(.9, .95, 1.0, 1.0);
 	this->cameraController->camera->SetFarClip(2000);
 	this->cameraController->camera->SetNearClip(10);
 

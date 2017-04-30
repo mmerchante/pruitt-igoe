@@ -56,5 +56,9 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 
 	vec3 outColor = terrainColor * diffuse * 30.0 + amb * specular + amb * ambient;
 
-	return mix(outColor, amb, saturate(-.175 + t / 2000.0)) * shadow + amb * saturate(-cosTheta) * .05;
+	outColor = mix(outColor, amb, saturate(-.175 + t / 2000.0)) * shadow + amb * saturate(-cosTheta) * .05;
+
+	vec3 desaturated = vec3(pow(dot(outColor, vec3(0.299, 0.587, 0.114)), 1.5));
+
+	return mix(outColor, desaturated, .8);
 }
