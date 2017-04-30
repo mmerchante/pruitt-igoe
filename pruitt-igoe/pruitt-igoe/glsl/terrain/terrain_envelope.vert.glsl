@@ -1,14 +1,15 @@
 #version 330
-#define FAR_CLIP 1000.0
 
 struct VertexData
 {
-	vec4 ssPos;
-	vec3 wsPos;
+	vec3 localVertexPosition;
+	vec3 localCameraPosition;
 };
 
+uniform vec4 CameraPosition;
 uniform mat4 ViewProj;
 uniform mat4 Model;
+uniform mat4 ModelInv;
 
 in vec4 vertexPosition;
 in vec4 vertexNormal;
@@ -22,7 +23,8 @@ void main()
 	vec4 p = Model * vertexPosition;
 	p.xyz += vertexNormal.xyz * 4.0f;
 
-	vertexData.wsPos = p.xyz;
-	vertexData.ssPos = ViewProj * p;
-    gl_Position = vertexData.ssPos;
+	vertexData.localVertexPosition = (ModelInv * vec4(p.xyz, 1.0)).xyz;
+	vertexData.localCameraPosition = (ModelInv * vec4(CameraPosition.xyz, 1.0)).xyz;
+
+    gl_Position = ViewProj * p;
 }

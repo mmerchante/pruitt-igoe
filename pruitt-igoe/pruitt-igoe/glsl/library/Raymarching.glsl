@@ -96,7 +96,7 @@ void main()
 
     float t = depth;
 	float d = CameraParameters.y;
-    float hitMaterial = 0.0;
+
 	bool hit = false;
 
 #ifdef DEBUG
@@ -127,6 +127,19 @@ void main()
 
 	if(hit)
 	{
+		// More details in intersections (similar to a discontinuity reduction)
+		// This GREATLY improves, for example, the gradient estimation for 
+		// big discontinuities such as box edges
+		for(int k = 0; k < SECONDARY_ITERATIONS; k++)
+		{
+			d = scene(current);
+	
+			if(d <= 0)
+				break;
+
+			t += d;
+			current += rayDir * d;
+		}
 
 #ifdef DEBUG
 		vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS));
@@ -138,7 +151,7 @@ void main()
 		// Transform into world space again
 		current = (Model * vec4(current, 1.0)).xyz;
 		t = length(CameraPosition.xyz - current);
-		normal = (ModelInvTr * vec4(normal, 0.0)).xyz;
+		normal = normalize((ModelInvTr * vec4(normal, 0.0)).xyz);
 
 		color = shade(current, normal, rayOrigin, rayDir, t);
 		out_Col = vec4(color, 1.0);

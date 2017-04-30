@@ -1,6 +1,6 @@
 #include "Terrain.h"
 
-#define SHOW_WIREFRAME true
+#define SHOW_WIREFRAME false
 
 void Terrain::Awake()
 {
@@ -24,23 +24,26 @@ void Terrain::Awake()
 		int srcIndex = srcY * heightmap->GetWidth() + srcX;
 
 		// For testing purposes, uncomment
-		//hpHeightmap[i] = glm::sin(i * .0001f) * 70.f;
+		//hpHeightmap[i] = glm::sin(i * .01f) * .5f + .5f;
 		hpHeightmap[i] = (float)heightmap->GetRawPixels()[srcIndex * 4];
 	}
 
-	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, 1.f, resolution);
+	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, 64.f, resolution);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
 	this->renderer->SetMesh(terrainMesh);
 	this->material = new Material("terrain/terrain_envelope");
 	this->renderer->SetMaterial(material);
 
+	this->GetTransform()->SetLocalRotation(glm::vec3(0, -glm::radians(45.f), 0));
+	//this->GetTransform()->SetLocalPosition(glm::vec3(100, 0, 0));
 	// Match the raymarched terrain with the mesh
-	this->GetTransform()->SetLocalScale(glm::vec3(width, 64, height));
+	//this->GetTransform()->SetLocalScale(glm::vec3(heightmap->GetWidth(), 1, heightmap->GetHeight()));
 	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmap->GetWidth(), 64.f, 1.f / heightmap->GetHeight(), 0.f));
 
 	if (SHOW_WIREFRAME)
 	{
-		MeshRenderer * wireframeRenderer = this->gameObject->AddComponent<MeshRenderer>();
+		GameObject * wireframeGO = this->gameObject;// GameObject::Instantiate("wireframeTerrain");
+		MeshRenderer * wireframeRenderer = wireframeGO->AddComponent<MeshRenderer>();
 		wireframeRenderer->SetMesh(terrainMesh);
 
 		Material * wireframeMat = new Material("terrain/wireframe");
@@ -60,7 +63,7 @@ Mesh * Terrain::GenerateMesh(float * heightmap, int width, int height, float sca
 	std::vector<glm::vec2> uvs;
 
 	glm::vec2 pixelSize = glm::vec2(1.f / width, 1.f / height);
-	glm::vec4 resolutionMultiplier = glm::vec4(resolution / (float)width, 1.f, resolution / (float)height, 1.f);
+	glm::vec4 resolutionMultiplier = glm::vec4(resolution, scale / 255.f, resolution, 1.f);
 
 	// Vertex data
 	int index = 0;
@@ -68,7 +71,7 @@ Mesh * Terrain::GenerateMesh(float * heightmap, int width, int height, float sca
 	{
 		for (int x = 0; x < width; x++)
 		{
-			float h = heightmap[y * width + x] * scale / 255.f;
+			float h = heightmap[y * width + x];
 
 			glm::vec4 v = glm::vec4(x, h, y, 1.f);
 			glm::vec2 uv = glm::vec2(x, y + 1) * pixelSize;
