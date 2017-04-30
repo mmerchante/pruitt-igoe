@@ -32,6 +32,7 @@ int main()
 	
 	engine->Initialize(window);
 	engine->GetLog()->SetLogLevel(Log::LogLevel::Verbose);
+	engine->SetTargetFramerate(60);
 
 	GameObject * demo = GameObject::Instantiate("demo");
 	demo->AddComponent<DemoController>();

@@ -31,17 +31,18 @@ public:
     void Test();
 	Input * GetInput();
 
+	void AddShaderComposer(ShaderPassComposer * composer);
     void OnOpenGLContextChanged();
     void AddLogger(Log * logger);
-
 	sf::Window * GetWindow();
 
-	void AddShaderComposer(ShaderPassComposer * composer);
+	void SetTargetFramerate(int fps);
 	
     static Engine* GetInstance();
     static Log* GetLog();
     static float Time();
     static float DeltaTime();
+	static float ActualFrameTime();
 	static void CheckGLError();
 
     static glm::ivec2 GetScreenSize();
@@ -69,6 +70,8 @@ private:
 	sf::Window * window;
 	float time;
 	float deltaTime;
+	float actualFrameTime;
+	int targetFramerate;
 	bool mouseLocked;
 	std::chrono::steady_clock::time_point lastFrameClock;
 

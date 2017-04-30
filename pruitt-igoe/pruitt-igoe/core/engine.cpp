@@ -7,13 +7,14 @@
 #include "material.h"
 #include "log.h"
 #include <sstream>
+#include <thread>
 #include "ShaderPass.h"
 #include "assets\assetdatabase.h"
 
 Engine * Engine::instance = nullptr;
 
 Engine::Engine() : gameObjects(), cameras(), gameObjectsToAdd(),
-    gameObjectsToDelete(), input(new Input()), log(new ConcurrentLog<MultiLog>(new MultiLog())), time(0.f), deltaTime(0.f), mouseLocked(false)
+    gameObjectsToDelete(), input(new Input()), log(new ConcurrentLog<MultiLog>(new MultiLog())), time(0.f), deltaTime(0.f), actualFrameTime(0.f), targetFramerate(-1), mouseLocked(false)
 {
     this->log->GetInternalLogger()->AddLogger(new Log(&std::cout));
 }
@@ -250,6 +251,17 @@ void Engine::Start()
 		this->Render();
 
 		window->display();
+
+		if (targetFramerate > 0 && targetFramerate <= 60)
+		{
+			int ms = 1000.f / targetFramerate;
+			double frameDeltaMilli = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - frameClock).count();
+
+			this->actualFrameTime = frameDeltaMilli / 1000.f;
+
+			if (frameDeltaMilli < ms)
+				std::this_thread::sleep_for(std::chrono::milliseconds(ms - (int)frameDeltaMilli - 1));
+		}
 	}
 }
 
@@ -315,6 +327,11 @@ sf::Window * Engine::GetWindow()
 	return this->window;
 }
 
+void Engine::SetTargetFramerate(int fps)
+{
+	this->targetFramerate = fps;
+}
+
 void Engine::AddShaderComposer(ShaderPassComposer * composer)
 {
 	this->composers.push_back(composer);
@@ -342,6 +359,11 @@ float Engine::Time()
 float Engine::DeltaTime()
 {
     return GetInstance()->deltaTime;
+}
+
+float Engine::ActualFrameTime()
+{
+	return GetInstance()->actualFrameTime;
 }
 
 void Engine::CheckGLError()
