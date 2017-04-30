@@ -86,250 +86,142 @@ Mesh * MeshFactory::BuildUIQuad(bool writeOnly)
 	return output;
 }
 
-//
-//static const int CUB_IDX_COUNT = 36;
-//static const int CUB_VERT_COUNT = 24;
-//
-////These are functions that are only defined in this cpp file. They're used for organizational purposes
-////when filling the arrays used to hold the vertex and index data.
-//void createCubeVertexPositions(glm::vec4 * cub_vert_pos)
-//{
-//    int idx = 0;
-//    //Front face
-//    //UR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-//    //LR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, 0.5f, 1.0f);
-//    //LL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
-//    //UL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f);
-//
-//    //Right face
-//    //UR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, -0.5f, 1.0f);
-//    //LR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
-//    //LL
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, 0.5f, 1.0f);
-//    //UL
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-//
-//    //Left face
-//    //UR
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f);
-//    //LR
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
-//    //LL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f);
-//    //UL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
-//
-//    //Back face
-//    //UR
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
-//    //LR
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f);
-//    //LL
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
-//    //UL
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, -0.5f, 1.0f);
-//
-//    //Top face
-//    //UR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, -0.5f, 1.0f);
-//    //LR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-//    //LL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f);
-//    //UL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
-//
-//    //Bottom face
-//    //UR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, 0.5f, 1.0f);
-//    //LR
-//    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
-//    //LL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f);
-//    //UL
-//    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
-//}
-//
-//
-//void createCubeVertexNormals(glm::vec4 * cub_vert_nor)
-//{
-//    int idx = 0;
-//    //Front
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_nor[idx++] = glm::vec4(0,0,1,0);
-//    }
-//    //Right
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_nor[idx++] = glm::vec4(1,0,0,0);
-//    }
-//    //Left
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_nor[idx++] = glm::vec4(-1,0,0,0);
-//    }
-//    //Back
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_nor[idx++] = glm::vec4(0,0,-1,0);
-//    }
-//    //Top
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_nor[idx++] = glm::vec4(0,1,0,0);
-//    }
-//    //Bottom
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_nor[idx++] = glm::vec4(0,-1,0,0);
-//    }
-//}
-//
-//void createCubeVertexTBNs(glm::mat4 * cub_vert_TBN)
-//{
-//    int idx = 0;
-//    //Front
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_TBN[idx++] = glm::mat4(1);
-//    }
-//    //Right
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_TBN[idx++] = glm::mat4(1);
-//    }
-//    //Left
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_TBN[idx++] = glm::mat4(1);
-//    }
-//    //Back
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_TBN[idx++] = glm::mat4(1);
-//    }
-//    //Top
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_TBN[idx++] = glm::mat4(1, 0, 0, 0,
-//                                         0, 0, 1, 0,
-//                                        0, 1, 0, 0,
-//                                        0, 0, 0, 1);
-//    }
-//    //Bottom
-//    for(int i = 0; i < 4; i++){
-//        cub_vert_TBN[idx++] = glm::mat4(1);
-//    }
-//}
-//
-//
-//
-//void createCubeVertexColors(glm::vec4 * cub_vert_nor)
-//{
-//    for(int i = 0; i < CUB_VERT_COUNT; i++)
-//        cub_vert_nor[i] = glm::vec4(1,1,1,1);
-//}
-//
-//void createCubeVertexUVs(glm::vec2 * cub_vert_uv)
-//{
-//    //Texturing and Texture Animation Jin_Kim
-//    cub_vert_uv[0] =  glm::vec2(0, 0);
-//    cub_vert_uv[1] =  glm::vec2(0, 1);
-//    cub_vert_uv[2] =  glm::vec2(1, 1);
-//    cub_vert_uv[3] =  glm::vec2(1, 0);
-//
-//
-//    //Texturing and Texture Animation Jin_Kim
-//    cub_vert_uv[4] =  glm::vec2(0, 0);
-//    cub_vert_uv[5] =  glm::vec2(0, 1);
-//    cub_vert_uv[6] =  glm::vec2(1, 1);
-//    cub_vert_uv[7] =  glm::vec2(1, 0);
-//
-//
-//    //Texturing and Texture Animation Jin_Kim
-//
-//    cub_vert_uv[8] = glm::vec2(1, 0);
-//    cub_vert_uv[9] = glm::vec2(0, 0);
-//    cub_vert_uv[10] =  glm::vec2(0, 1);
-//    cub_vert_uv[11] =  glm::vec2(1, 1);
-//
-//
-//
-//    //Texturing and Texture Animation Jin_Kim
-//    cub_vert_uv[12] =  glm::vec2(1, 0);
-//    cub_vert_uv[13] =  glm::vec2(1, 1);
-//    cub_vert_uv[14] =  glm::vec2(0, 1);
-//    cub_vert_uv[15] =  glm::vec2(0, 0);
-//
-//    //Texturing and Texture Animation Jin_Kim
-//    cub_vert_uv[16] =  glm::vec2(0, 0);
-//    cub_vert_uv[17] =  glm::vec2(0, 1);
-//    cub_vert_uv[18] =  glm::vec2(1, 1);
-//    cub_vert_uv[19] =  glm::vec2(1, 0);
-//
-//    //Texturing and Texture Animation Jin_Kim
-//    cub_vert_uv[20] =  glm::vec2(0, 0);
-//    cub_vert_uv[21] =  glm::vec2(0, 1);
-//    cub_vert_uv[22] =  glm::vec2(1, 1);
-//    cub_vert_uv[23] =  glm::vec2(1, 0);
-//}
-//
-//void createCubeIndices(GLuint * cub_idx)
-//{
-//    int idx = 0;
-//    for(int i = 0; i < 6; i++){
-//        cub_idx[idx++] = i*4;
-//        cub_idx[idx++] = i*4+1;
-//        cub_idx[idx++] = i*4+2;
-//        cub_idx[idx++] = i*4;
-//        cub_idx[idx++] = i*4+2;
-//        cub_idx[idx++] = i*4+3;
-//    }
-//}
-//
-//
-//Mesh *MeshFactory::BuildCube(bool interleaved, bool writeOnly)
-//{
-//    GLuint * indices = new GLuint[CUB_IDX_COUNT];
-//    glm::vec4 * vertices = new glm::vec4[CUB_VERT_COUNT];
-//    glm::vec4 * normals = new glm::vec4[CUB_VERT_COUNT];
-//    glm::vec4 * tangents = new glm::vec4[CUB_VERT_COUNT];
-//    glm::vec4 * binormals = new glm::vec4[CUB_VERT_COUNT];
-//    glm::vec4 * colors = new glm::vec4[CUB_VERT_COUNT];
-//    glm::vec2 * UVs = new glm::vec2[CUB_VERT_COUNT];
-//
-//
-//    createCubeVertexPositions(vertices);
-//    createCubeVertexNormals(normals);
-//
-//    createCubeVertexNormals(tangents);
-//    createCubeVertexNormals(binormals);
-//
-//    createCubeIndices(indices);
-//    createCubeVertexColors(colors);
-//    createCubeVertexUVs(UVs);
-//
-//
-//    Mesh * output = new Mesh();
-//    output->SetIndices(indices, CUB_IDX_COUNT);
-//    output->SetVertices(vertices, CUB_VERT_COUNT);
-//    output->SetNormals(normals, CUB_VERT_COUNT);
-//    output->SetTangents(tangents, CUB_VERT_COUNT);
-//    output->SetBiNormals(binormals, CUB_VERT_COUNT);
-//
-//    output->SetColors(colors, CUB_VERT_COUNT);
-//    output->SetUVs(UVs, CUB_VERT_COUNT);
-//
-//    if(interleaved)
-//    {
-//        output->SetInterleaved(true);
-//        output->Interleave();
-//    }
-//
-//    if(writeOnly)
-//        output->SetWriteOnly(true); // So we don't worry about these arrays being leaked...
-//
-//    output->Upload();
-//
-//    return output;
-//}
-//
+
+static const int CUB_IDX_COUNT = 36;
+static const int CUB_VERT_COUNT = 24;
+
+void createCubeVertexPositions(glm::vec4 * cub_vert_pos)
+{
+    int idx = 0;
+    //Front face
+    //UR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    //LR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, 0.5f, 1.0f);
+    //LL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
+    //UL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f);
+
+    //Right face
+    //UR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, -0.5f, 1.0f);
+    //LR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
+    //LL
+    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, 0.5f, 1.0f);
+    //UL
+    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+    //Left face
+    //UR
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f);
+    //LR
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
+    //LL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f);
+    //UL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
+
+    //Back face
+    //UR
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
+    //LR
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f);
+    //LL
+    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
+    //UL
+    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, -0.5f, 1.0f);
+
+    //Top face
+    //UR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, -0.5f, 1.0f);
+    //LR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    //LL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f);
+    //UL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f);
+
+    //Bottom face
+    //UR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, 0.5f, 1.0f);
+    //LR
+    cub_vert_pos[idx++] = glm::vec4(0.5f, -0.5f, -0.5f, 1.0f);
+    //LL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f);
+    //UL
+    cub_vert_pos[idx++] = glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f);
+}
+
+void createCubeVertexNormals(glm::vec4 * cub_vert_nor)
+{
+    int idx = 0;
+    //Front
+    for(int i = 0; i < 4; i++){
+        cub_vert_nor[idx++] = glm::vec4(0,0,1,0);
+    }
+    //Right
+    for(int i = 0; i < 4; i++){
+        cub_vert_nor[idx++] = glm::vec4(1,0,0,0);
+    }
+    //Left
+    for(int i = 0; i < 4; i++){
+        cub_vert_nor[idx++] = glm::vec4(-1,0,0,0);
+    }
+    //Back
+    for(int i = 0; i < 4; i++){
+        cub_vert_nor[idx++] = glm::vec4(0,0,-1,0);
+    }
+    //Top
+    for(int i = 0; i < 4; i++){
+        cub_vert_nor[idx++] = glm::vec4(0,1,0,0);
+    }
+    //Bottom
+    for(int i = 0; i < 4; i++){
+        cub_vert_nor[idx++] = glm::vec4(0,-1,0,0);
+    }
+}
+
+void createCubeIndices(GLuint * cub_idx)
+{
+    int idx = 0;
+    for(int i = 0; i < 6; i++){
+        cub_idx[idx++] = i*4+2;
+        cub_idx[idx++] = i*4+1;
+        cub_idx[idx++] = i*4;
+        cub_idx[idx++] = i*4+3;
+        cub_idx[idx++] = i*4+2;
+        cub_idx[idx++] = i*4;
+    }
+}
+
+Mesh *MeshFactory::BuildCube(bool interleaved, bool writeOnly)
+{
+    GLuint * indices = new GLuint[CUB_IDX_COUNT];
+    glm::vec4 * vertices = new glm::vec4[CUB_VERT_COUNT];
+    glm::vec4 * normals = new glm::vec4[CUB_VERT_COUNT];
+
+	createCubeVertexPositions(vertices);
+    createCubeVertexNormals(normals);
+	createCubeIndices(indices);
+	
+    Mesh * output = new Mesh();
+    output->SetIndices(indices, CUB_IDX_COUNT);
+    output->SetVertices(vertices, CUB_VERT_COUNT);
+    output->SetNormals(normals, CUB_VERT_COUNT);
+
+    if(interleaved)
+    {
+        output->SetInterleaved(true);
+        output->Interleave();
+    }
+
+    output->Upload(writeOnly);
+
+    return output;
+}
+
 //Mesh *MeshFactory::BuildWireCube()
 //{
 //    int vertexCount = 8;

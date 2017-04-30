@@ -205,5 +205,7 @@
     <None Include="glsl\terrain\terrain_envelope.vert.glsl" />
     <None Include="glsl\terrain\wireframe.vert.glsl" />
     <None Include="glsl\terrain\wireframe.frag.glsl" />
+    <None Include="glsl\raymarched\light_pillar.frag.glsl" />
+    <None Include="glsl\raymarched\light_pillar.vert.glsl" />
   </ItemGroup>
 </Project>

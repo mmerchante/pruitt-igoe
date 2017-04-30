@@ -20,7 +20,20 @@ void DemoController::Awake()
 	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_1.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
 	terrain->material->SetTexture("Heightfield", heightmap);
-		
+
+	GameObject * lightPillar = GameObject::Instantiate("lightPillar");
+	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
+	pillarRenderer->SetMesh(MeshFactory::BuildCube(true, true));
+	pillarRenderer->GetTransform()->SetLocalScale(glm::vec3(10.f, 1000.f, 10.f));
+	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(35.f, 500.f, 50.f));
+
+	Material * pillarMaterial = new Material("raymarched/light_pillar");
+	//pillarMaterial->SetFeature(GL_CULL_FACE, false);
+	pillarRenderer->SetMaterial(pillarMaterial);
+
+	raymarchedMaterials.push_back(pillarMaterial);
+	raymarchedMaterials.push_back(terrain->material);
+
 	ShaderPassComposer * composer = new ShaderPassComposer();
 	composer->SetSourceTarget(raymarchingTarget);
 
@@ -53,5 +66,6 @@ void DemoController::Update()
 	glm::mat4 invProj = glm::inverse(this->cameraController->camera->GetViewProjectionMatrix());
 	this->mainQuadMaterial->SetMatrix("InvViewProjection", invProj);*/
 
-	this->terrain->material->SetVector("CameraPosition", glm::vec4(this->cameraController->GetTransform()->WorldPosition(), 1.0));
+	for(int i = 0; i < raymarchedMaterials.size(); i++)
+		raymarchedMaterials[i]->SetVector("CameraPosition", glm::vec4(this->cameraController->GetTransform()->WorldPosition(), 1.0));
 }

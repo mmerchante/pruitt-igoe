@@ -15,5 +15,8 @@ private:
 	Material * mainQuadMaterial;
 	GameObject * mainQuad;
 	Terrain * terrain;
+
+	// The set of materials that need specific uniforms for raymarching
+	std::vector<Material*> raymarchedMaterials;
 };
 

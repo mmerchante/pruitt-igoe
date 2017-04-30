@@ -1,7 +1,7 @@
 #version 450
 
 #define FAR_CLIP 500.0
-#define MAX_ITERATIONS 10
+#define MAX_ITERATIONS 5
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .01
 
@@ -16,19 +16,18 @@ struct Ray {
 
 struct VertexData
 {
-	vec4 ssPos;
-	vec3 wsPos;
+	vec3 localVertexPosition;
+	vec3 localCameraPosition;
 };
+
+uniform mat4 ModelInv;
+uniform mat4 Model;
 
 uniform vec4 CameraPosition;
 uniform vec4 CameraParameters;
-uniform vec4 TerrainScale;
 
 uniform float u_debug;
 uniform float Time;
-
-uniform sampler2D Heightfield;
-uniform vec4 Heightfield_Size;
 
 uniform sampler2D FeedbackBuffer;
 
@@ -75,8 +74,7 @@ Ray getRay(vec3 origin, vec3 dir)
 
 float terrainSDF(vec3 point)
 {
-	float h = texture2D(Heightfield, point.xz * TerrainScale.xz).r * TerrainScale.y;
-	float d = (point.y - h);
+	float d = sdCappedCylinder(point, vec2(.5, 1.0));
 	return d;
 }
 
@@ -141,13 +139,12 @@ float SamplePreviousFrame(vec2 uv)
 
 void main()
 {
-	// All in world space
-	vec3 toCamera = vertexData.wsPos - CameraPosition.xyz;
+	vec3 toCamera = vertexData.localVertexPosition - vertexData.localCameraPosition;
 	vec3 rayDir = normalize(toCamera);
-	float depth = length(toCamera) * .97;
+	float depth = length(toCamera);
 		
 	// Renormalize due to interpolation
-	Ray ray = getRay(CameraPosition.xyz, rayDir);
+	Ray ray = getRay(vertexData.localCameraPosition, rayDir);
 
     vec3 color = vec3(0.0);
     vec3 current = ray.position + ray.direction * depth;
@@ -172,34 +169,16 @@ void main()
 		current += ray.direction * d;
 		iterationCount += 1.0;
 
+		// Far clip
 		if(t >= CameraParameters.y)
 			break;
 	}
 
-	if(hit)
-	{
-		// More details in intersections (similar to a discontinuity reduction)
-		for(int k = 0; k < SECONDARY_ITERATIONS; k++)
-		{
-			if(t >= FAR_CLIP)
-				break;
-
-			d = evaluateSceneSDFSimple(current);
-	
-			if(d <= 0)
-				break;
-
-			t += d;
-			current += ray.direction * d;
-		}
-	}
+	// Transform into world space again
+	current = (Model * vec4(current, 1.0)).xyz;
+	t = length(CameraPosition.xyz - current);
 
 	color = shade(current, ray, t);
-
-	// Gamma correction
-	color = pow(color, vec3(.45454));
-	vec3 debugColor = debugIterations(iterationCount / float(MAX_ITERATIONS));
-
 	out_Col = vec4(color, 1.0);
 
 	if(!hit)
