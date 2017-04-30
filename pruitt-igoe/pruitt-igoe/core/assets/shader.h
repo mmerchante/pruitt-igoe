@@ -4,6 +4,7 @@
 #include "../../common.h"
 #include "asset.h"
 #include <vector>
+#include <unordered_map>
 
 class Mesh;
 class ShaderListener;
@@ -40,7 +41,7 @@ public:
 
 protected:
 	int GetFileChecksum(const std::string& filename);
-	std::string ReadFile(const std::string& filename);	
+	std::string ReadFile(const std::string& filename, std::unordered_map<std::string, bool> map = std::unordered_map<std::string, bool>());
 	void PrintShaderInfoLog(int shader);
 
 	void DispatchReloadEvent();

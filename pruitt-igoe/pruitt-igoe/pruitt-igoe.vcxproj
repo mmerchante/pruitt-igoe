@@ -192,6 +192,7 @@
     <None Include="glsl\diffuse.vert.glsl" />
     <None Include="glsl\flat.frag.glsl" />
     <None Include="glsl\flat.vert.glsl" />
+    <None Include="glsl\library\Raymarching.glsl" />
     <None Include="glsl\minion.vert.glsl" />
     <None Include="glsl\minion.frag.glsl" />
     <None Include="glsl\minKernel.frag.glsl" />

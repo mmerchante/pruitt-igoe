@@ -4,9 +4,11 @@
 #include "../material.h"
 #include <iostream>
 #include <fstream>
+#include <regex>
 #include "../engine.h"
 
 const std::string SHADER_BASE_DIRECTORY = "./glsl/";
+const std::string SHADER_LIBRARY_DIRECTORY = "./glsl/library/";
 
 Shader::Shader() : Asset(), shaderName(""),
     prog(-1), attrPos(-1), attrNor(-1), attrCol(-1), attrUV(-1), loaded(false), lastChecksum(-1)
@@ -287,21 +289,54 @@ int Shader::GetFileChecksum(const std::string & filename)
 	return 0;
 }
 
-std::string Shader::ReadFile(const std::string& filename)
+std::string Shader::ReadFile(const std::string& filename, std::unordered_map<std::string, bool> map)
 {
 	std::ifstream in(filename, std::ios::in);
-
+	
 	if (in)
 	{
+		// Prevent circular references
+		if (map.find(filename) != map.end())
+		{
+			std::cerr << "Circular reference while parsing include " << filename << ". Ignoring include... " <<  std::endl;
+			return "";
+		}
+
+		map[filename] = true;
 		std::string contents;
-		in.seekg(0, std::ios::end);
-		contents.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-		in.read(&contents[0], contents.size());
+		std::string line;
+		
+		std::regex word_regex("#include <[aA-zZ]+>");
+
+		int includeCharLength = std::string("#include <").size();
+
+		while (!in.eof())
+		{
+			std::getline(in, line);
+
+			auto words_begin = std::sregex_iterator(line.begin(), line.end(), word_regex);
+			auto words_end = std::sregex_iterator();
+
+			int distance = std::distance(words_begin, words_end);
+
+			// We found a match
+			if (distance == 1)
+			{
+				std::string library = line.substr(includeCharLength, line.size() - includeCharLength - 1);
+				library = SHADER_LIBRARY_DIRECTORY + library + ".glsl";
+				contents += ReadFile(library, map);
+			}
+			else
+			{
+				contents += line + '\n';
+			}
+		}
+
 		in.close();
 		return(contents);
 	}
 
+	std::cerr << "Could not find " << filename << std::endl;
 	return "";
 }
 
