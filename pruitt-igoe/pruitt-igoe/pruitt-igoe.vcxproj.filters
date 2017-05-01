@@ -90,6 +90,9 @@
     <ClCompile Include="demo\Terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="demo\generator\TerrainGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
@@ -168,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="demo\Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\generator\TerrainGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

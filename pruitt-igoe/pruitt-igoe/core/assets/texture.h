@@ -28,6 +28,7 @@ public:
     GLuint GetTextureID();
 
 	void LoadFromRaw(const uint8_t * pixels, int width, int height, const TextureParameters& p);
+	void LoadFromRawFP(const float * pixels, int width, int height, const TextureParameters& p);
 
     virtual void LoadFromFilename(const std::string& filename);
 	virtual void LoadFromFilename(const std::string& filename, const TextureParameters& p);

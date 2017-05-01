@@ -98,7 +98,6 @@ float shadows(vec3 origin, vec3 lightPosition)
     float t = SHADOW_OFFSET;
     float soft = .5;
 
-    // WebGL doesnt like loops that cannot be easily unrolled
 	for(int i = 0; i < SHADOW_ITERATIONS; i++)
 	{
 		float d = min(scene(origin + direction * t), maxDistance);
@@ -144,14 +143,14 @@ void main()
 	{
 		d = scene(current);
 
+		t += d;
+		current += rayDir * d;
+
 		if(d < EPSILON)
 		{
 			hit = true;
 			break;
 		}
-
-		t += d;
-		current += rayDir * d;
 
 #ifdef DEBUG
 		iterationCount += 1.0;
@@ -167,11 +166,11 @@ void main()
 		{
 			d = scene(current);
 	
-			if(d <= 0)
-				break;
-
 			t += d;
 			current += rayDir * d;
+
+			if(d <= 0)
+				break;
 		}
 
 #ifdef DEBUG

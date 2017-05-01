@@ -9,7 +9,7 @@ in vec4 vertexNormal;
 void main()
 {
 	vec4 p = Model * vertexPosition;
-	p.xyz += vertexNormal.xyz * 4.0f;
+//	p.xyz += vertexNormal.xyz * 4.0f;
 
     gl_Position = ViewProj * p;
 }

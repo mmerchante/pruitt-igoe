@@ -3,12 +3,12 @@
 #define MAX_ITERATIONS 200
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .05
-#define NORMAL_ESTIMATION_EPSILON 2.0
+#define NORMAL_ESTIMATION_EPSILON 1.0
 
 // SHADOW PARAMETERS
-#define SHADOW_ITERATIONS 100
-#define SHADOW_SOFT_FACTOR 20.0
-#define SHADOW_EPSILON .5
+#define SHADOW_ITERATIONS 300
+#define SHADOW_SOFT_FACTOR 50.0
+#define SHADOW_EPSILON .85
 #define SHADOW_OFFSET 10.0
 
 #define SHADOWS
@@ -23,17 +23,17 @@ uniform float Time;
  
 float scene(vec3 point)
 {
-	float h = texture2D(Heightfield, point.xz * TerrainScale.xz).r * TerrainScale.y;
+	float h = texture2D(Heightfield, point.xz * TerrainScale.xz).r;// * TerrainScale.y;
 	float d = (point.y - h);
 	return d;
 } 
 
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 { 
-	vec3 lightPosition = vec3(1024.0, 155.0, 2024.0);
+	vec3 lightPosition = vec3(0.0, 255.0, 0.0);
 
 	float steepness = saturate(pow(abs(normal.y), 10.0));
-	float snow = saturate(smoothstep(150.0 * (1.0 - steepness), 250.0, point.y));
+	float snow = saturate((point.y + steepness * 50.0 + 100.f)/100.f);
 
 	vec3 lightDirection = normalize(lightPosition - point);
 	float cosTheta = dot(normal, lightDirection);
@@ -52,13 +52,12 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 
 	vec3 lightColor = vec3(1.25, 1.2, .9);
 
-	vec3 shadow = mix(vec3(.1, .35, .9), vec3(1.0), 1.0 - shadows(point + normal, lightPosition));
+	vec3 shadow =  mix(vec3(.1, .35, .9), vec3(1.0), 1.0 - shadows(point + normal, lightPosition));
 
 	vec3 outColor = terrainColor * diffuse * 30.0 + amb * specular + amb * ambient;
-
-	outColor = mix(outColor, amb, saturate(-.175 + t / 2000.0)) * shadow + amb * saturate(-cosTheta) * .05;
+	outColor = mix(outColor, amb, saturate(-.1 + t / 1500.0)) * shadow + amb * saturate(-cosTheta) * .05;
 
 	vec3 desaturated = vec3(pow(dot(outColor, vec3(0.299, 0.587, 0.114)), 1.5));
 
-	return mix(outColor, desaturated, .8);
+	return mix(outColor, desaturated, .35);
 }

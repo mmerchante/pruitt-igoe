@@ -55,6 +55,30 @@ void Texture::LoadFromRaw(const uint8_t * pixels, int width, int height, const T
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Texture::LoadFromRawFP(const float * pixels, int width, int height, const TextureParameters & p)
+{
+	if (this->IsValid())
+		return;
+
+	this->width = width;
+	this->height = height;
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, p.minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, p.magFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, p.wrapS);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, p.wrapT);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, pixels);
+
+	if (p.minFilter == GL_LINEAR_MIPMAP_LINEAR)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Texture::LoadFromFilename(const std::string& filename)
 {
 	LoadFromFilename(filename, TextureParameters());

@@ -20,10 +20,6 @@ void DemoController::Awake()
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
 	this->terrain = terrainGO->AddComponent<Terrain>();
 
-	Texture * heightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
-
-	terrain->material->SetTexture("Heightfield", heightmap);
-
 	GameObject * lightPillar = GameObject::Instantiate("lightPillar");
 	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
 	pillarRenderer->SetMesh(MeshFactory::BuildCube(true, true));
