@@ -100,17 +100,13 @@ float shadows(vec3 origin, vec3 lightPosition)
 
 	for(int i = 0; i < SHADOW_ITERATIONS; i++)
 	{
-		float d = min(scene(origin + direction * t), maxDistance);
+		float d = min(scene(origin + direction * t), maxDistance) * SHADOW_BIAS;
+
+		soft = min(soft, SHADOW_SOFT_FACTOR * (d / t));
+		t += d;
 
 		if(d < SHADOW_EPSILON)
 			break;
-
-		soft = min(soft, SHADOW_SOFT_FACTOR * (d / t));
-
-		//if(t >= maxDistance)
-		//	break;
-
-		t += d;
 	}
 
 	soft = clamp(soft * 2.0, 0.0, 1.0);

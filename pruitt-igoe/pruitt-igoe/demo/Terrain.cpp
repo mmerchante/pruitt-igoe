@@ -1,22 +1,29 @@
 #include "Terrain.h"
 #include "generator\TerrainGenerator.h"
 
-#define SHOW_WIREFRAME true
+#define SHOW_WIREFRAME false
 
 void Terrain::Awake()
 {
-	TerrainGenerator generator;
-
-	generator.SetBaseGenerator(new FractalGenerator(1.0f, .45f, 356.f));
-
 	int heightmapSize = 4096;
+	int approxHeightmapSize = heightmapSize;
+
+	TerrainGenerator lowFrequencyGenerator;
+	lowFrequencyGenerator.SetBaseGenerator(new FractalGenerator(2, 1.5f, 2.15f, .5f, 375.f));
+
+	float * approxTerrain = lowFrequencyGenerator.Generate(approxHeightmapSize, approxHeightmapSize);
+	glm::vec3 * approxTerrainGradient = GetNormalMap(approxTerrain, approxHeightmapSize, approxHeightmapSize);
+
+	TerrainGenerator generator;
+	FractalGenerator * advGen = new FractalGenerator(12, 1.5f, 2.15f, .5f, 300.f);
+	advGen->SetNormalMap(approxTerrainGradient, approxHeightmapSize);
+	generator.SetBaseGenerator(advGen);
+
 	float * rawTerrain = generator.Generate(heightmapSize, heightmapSize);
-/*
-	ReadableTexture * heightmap = AssetDatabase::GetInstance()->LoadAsset<ReadableTexture>("resources/heightfield_1.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
-*/
-	int resolution = 256;
-	int width = heightmapSize / resolution;
-	int height = heightmapSize / resolution;
+
+	int resolutionDownsampling = 32;
+	int width = heightmapSize / resolutionDownsampling;
+	int height = heightmapSize / resolutionDownsampling;
 
 	int size = width * height;
 	float * hpHeightmap = new float[size];
@@ -26,25 +33,17 @@ void Terrain::Awake()
 		int dstX = i % width;
 		int dstY = i / width;
 
-		int srcX = dstX * resolution;
-		int srcY = dstY * resolution;
+		int srcX = dstX * resolutionDownsampling;
+		int srcY = dstY * resolutionDownsampling;
 
 		int srcIndex = srcY * heightmapSize + srcX;
-
-		if (!glm::isinf(rawTerrain[srcIndex]))
-			hpHeightmap[i] = rawTerrain[srcIndex];
-		else
-			hpHeightmap[i] = 1;
-
-		// For testing purposes, uncomment
-		//hpHeightmap[i] = glm::sin(i * .01f) * .5f + .5f;
-		/*hpHeightmap[i] = rawTerrain[srcIndex];*/// (float)heightmap->GetRawPixels()[srcIndex * 4];
+		hpHeightmap[i] = rawTerrain[srcIndex] * 1.025;
 	}
 
 	float verticalScale = 1.f;
 	float scale = .5f;
 	
-	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolution);
+	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolutionDownsampling);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
 	this->renderer->SetMesh(terrainMesh);
 	this->material = new Material("terrain/terrain_envelope");
@@ -58,13 +57,16 @@ void Terrain::Awake()
 	//Texture * readOnlyHeightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
 	Texture * fpTexture = new Texture();
-	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+
+	//Texture * heightmapNormal = GetNormalMap(rawTerrain, heightmapSize, heightmapSize);
 
 	this->material->SetTexture("Heightfield", fpTexture);
+	//this->material->SetTexture("HeightfieldNormal", heightmapNormal);
 
 	if (SHOW_WIREFRAME)
 	{
-		GameObject * wireframeGO = this->gameObject;// GameObject::Instantiate("wireframeTerrain");
+		GameObject * wireframeGO = GameObject::Instantiate("wireframeTerrain");
 		MeshRenderer * wireframeRenderer = wireframeGO->AddComponent<MeshRenderer>();
 		wireframeRenderer->SetMesh(terrainMesh);
 
@@ -76,6 +78,54 @@ void Terrain::Awake()
 	}
 
 	delete[] hpHeightmap;
+}
+
+
+inline
+float Sample(float * heightmap, int x, int y, int width, int height)
+{
+	return heightmap[glm::clamp(y, 0, height - 1) * width + glm::clamp(x, 0, width - 1)];
+}
+
+glm::vec3 * Terrain::GetNormalMap(float * heightmap, int width, int height)
+{
+	glm::vec3 * output = new glm::vec3[width * height];
+
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			float horizontal = 0.f;
+			horizontal += Sample(heightmap, x - 1, y + 1, width, height);
+			horizontal += Sample(heightmap, x - 1, y    , width, height) * 2.f;
+			horizontal += Sample(heightmap, x - 1, y - 1, width, height);
+
+			horizontal -= Sample(heightmap, x + 1, y + 1, width, height);
+			horizontal -= Sample(heightmap, x + 1, y    , width, height) * 2.f;
+			horizontal -= Sample(heightmap, x + 1, y - 1, width, height);
+
+			float vertical = 0.f;
+			vertical += Sample(heightmap, x - 1, y - 1, width, height);
+			vertical += Sample(heightmap, x    , y - 1, width, height) * 2;
+			vertical += Sample(heightmap, x + 1, y - 1, width, height);
+
+			vertical -= Sample(heightmap, x - 1, y + 1, width, height);
+			vertical -= Sample(heightmap, x	   , y + 1, width, height) * 2;
+			vertical -= Sample(heightmap, x + 1, y + 1, width, height);
+
+			int index = y * width + x;
+			output[index] = glm::normalize(glm::vec3(horizontal, vertical, .5f));
+
+			/*output[index] = n.x * 255;
+			output[index + 1] = n.y * 255;
+			output[index + 2] = n.z * 255;
+			output[index + 3] = 0;*/
+		}
+	}
+/*
+	Texture * normalMap = new Texture();
+	normalMap->LoadFromRaw(output, width, height, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));*/
+	return output;
 }
 
 Mesh * Terrain::GenerateMesh(float * heightmap, int width, int height, float scale, float resolution)

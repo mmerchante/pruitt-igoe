@@ -10,18 +10,24 @@ public:
 class FractalGenerator : public BaseGenerator
 {
 public:
-	FractalGenerator(float frequency, float persistence, float amplitude);
+	FractalGenerator(int octaves, float frequency, float frequencyMultiplier, float amplitudeMultiplier, float amplitude);
 	virtual void Generate(float * terrain, int width, int height);
+
+	void SetNormalMap(glm::vec3 * normalMap, int size);
 
 private:
 
-	float fbm(float x, float y, float frequency, float persistence, float amplitude);
+	float fbm(float x, float y);
+	float advFractal(float x, float y);
 	float perlin2D(float x, float y);
 
-	glm::vec2 * gradients;
+	glm::vec3 * terrainNormalMap;
+	int terrainNormalMapSize;
 
+	int octaves;
 	float frequency;
-	float persistence;
+	float frequencyMultiplier;
+	float amplitudeMultiplier;
 	float amplitude;
 	int gradientMapSize;
 };

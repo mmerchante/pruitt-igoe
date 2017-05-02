@@ -10,6 +10,7 @@ public:
 
 protected:
 	Mesh * GenerateMesh(float * heightmap, int width, int height, float scale, float resolution);
+	glm::vec3 * GetNormalMap(float * heightmap, int width, int height);
 	MeshRenderer * renderer;
 };
 
