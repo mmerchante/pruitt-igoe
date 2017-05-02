@@ -5,7 +5,7 @@
 
 void Terrain::Awake()
 {
-	int heightmapSize = 4096;
+	int heightmapSize = 2048;
 	int approxHeightmapSize = heightmapSize;
 
 	TerrainGenerator lowFrequencyGenerator;

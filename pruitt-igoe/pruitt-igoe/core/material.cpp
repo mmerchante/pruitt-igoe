@@ -53,7 +53,7 @@ void Material::OnShaderReloaded()
 		ReloadUniformValue((*f).first, floatUniforms);
 }
 
-Material::Material(Shader *shader) : blendOperation(BlendOperation(GL_ONE, GL_ZERO)), overrideDrawingMode(-1), queue(Material::Geometry), shader(nullptr), featureMap()
+Material::Material(Shader *shader) : blendOperation(BlendOperation(GL_ONE, GL_ZERO)), overrideDrawingMode(-1), queue(Material::Geometry), shader(nullptr), featureMap(), depthWrite(true)
 {
     // Default values
     this->featureMap[GL_DEPTH_TEST] = true;
@@ -151,13 +151,29 @@ void Material::Render(Mesh * mesh, const glm::mat4& viewProj, const glm::vec4& c
         }
     }
 
+	glDepthMask(depthWrite);
+
     if(featureMap[GL_BLEND] == true)
         glBlendFunc(blendOperation.source, blendOperation.destination);
+
+	if (featureMap[GL_STENCIL_TEST] == true)
+	{
+		glStencilMask(stencilOperation.mask);
+		glStencilFunc(stencilOperation.operation, 1, 0xFF); // hardcoded for now...
+		glStencilOp(stencilOperation.fail, stencilOperation.zFail, stencilOperation.pass);
+	}
 
     if(overrideDrawingMode == -1)
         shader->Render(mesh, (GLenum) GL_TRIANGLES);
     else
         shader->Render(mesh,(GLenum) overrideDrawingMode);
+
+	// Update all features needed for this draw call!
+	for (FeatureIterator f = featureMap.begin(); f != featureMap.end(); f++)
+	{
+		GLenum id = f->first;
+		glDisable(id);
+	}
 }
 
 void Material::SetInt(std::string name, int i)
@@ -222,6 +238,16 @@ bool Material::GetFeature(GLenum id)
 void Material::SetBlendOperation(Material::BlendOperation op)
 {
     this->blendOperation = op;
+}
+
+void Material::SetStencilOperation(StencilOperation op)
+{
+	this->stencilOperation = op;
+}
+
+void Material::SetDepthWrite(bool write)
+{
+	this->depthWrite = write;
 }
 
 void Material::SetRenderingQueue(Material::RenderingQueue queue)

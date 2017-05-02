@@ -2,6 +2,9 @@
 // The shader assumes a constant material.
 // It has the main function, and assumes the existence of certain functions, such as 
 
+// Conservative depth testing
+layout (depth_greater) out float gl_FragDepth;
+
 // - shade:  the output color
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t);
 

@@ -24,6 +24,9 @@ int main()
 
 	sf::ContextSettings window_settings;
 	window_settings.depthBits = 24;
+	window_settings.stencilBits = 8;
+	window_settings.majorVersion = 4;
+	window_settings.minorVersion = 0;
 
 	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), 
 										"pruitt-igoe", sf::Style::Default, window_settings);	

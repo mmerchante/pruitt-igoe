@@ -4,7 +4,7 @@
 void DemoController::Awake()
 {
 	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
-	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, 32, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 	//raymarchingTarget->AddDrawBuffer(GL_DEPTH_ATTACHMENT);
 	raymarchingTarget->Load();
 
@@ -16,21 +16,51 @@ void DemoController::Awake()
 	this->cameraController->camera->backgroundColor = glm::vec4(.9, .95, 1.0, 1.0);
 	this->cameraController->camera->SetFarClip(2000);
 	this->cameraController->camera->SetNearClip(10);
+	this->cameraController->camera->clearStencil = true;
+
+	GameObject * portalGO = GameObject::Instantiate("portal");
+	portalGO->GetTransform()->SetLocalScale(glm::vec3(512.f));
+	portalGO->GetTransform()->SetLocalPosition(glm::vec3(512, 0.f, 512));
+	MeshRenderer * portalRenderer = portalGO->AddComponent<MeshRenderer>();
+	portalRenderer->SetMesh(MeshFactory::BuildCube(true));
+	Material * portalMaterial = new Material("flat");
+	portalRenderer->SetMaterial(portalMaterial);
+
+	Material::StencilOperation stencilPortal;
+	stencilPortal.mask = 0xFF;
+	stencilPortal.operation = GL_ALWAYS;
+	stencilPortal.fail = GL_REPLACE;
+	stencilPortal.zFail = GL_REPLACE;
+	stencilPortal.pass = GL_REPLACE;
+	portalMaterial->SetFeature(GL_STENCIL_TEST, true);
+	portalMaterial->SetDepthWrite(false);
+	portalMaterial->SetStencilOperation(stencilPortal);
 
 	GameObject * terrainGO = GameObject::Instantiate("terrain");
 	this->terrain = terrainGO->AddComponent<Terrain>();
 
+	Material::StencilOperation stencilTerrain;
+	stencilTerrain.mask = 0x00;
+	stencilTerrain.operation = GL_EQUAL;
+	stencilTerrain.fail = GL_KEEP;
+	stencilTerrain.zFail = GL_KEEP;
+	stencilTerrain.pass = GL_KEEP;
+	this->terrain->material->SetFeature(GL_STENCIL_TEST, true);
+	this->terrain->material->SetStencilOperation(stencilTerrain);
+
+
+/*
 	GameObject * lightPillar = GameObject::Instantiate("lightPillar");
 	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
 	pillarRenderer->SetMesh(MeshFactory::BuildCube(true, true));
 	pillarRenderer->GetTransform()->SetLocalScale(glm::vec3(10.f, 1000.f, 10.f));
-	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(512, 64, 512));
+	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(512, 64, 512));*/
 
-	Material * pillarMaterial = new Material("raymarched/light_pillar");
-	//pillarMaterial->SetFeature(GL_CULL_FACE, false);
-	pillarRenderer->SetMaterial(pillarMaterial);
+	//Material * pillarMaterial = new Material("raymarched/light_pillar");
+	////pillarMaterial->SetFeature(GL_CULL_FACE, false);
+	//pillarRenderer->SetMaterial(pillarMaterial);
 
-	raymarchedMaterials.push_back(pillarMaterial);
+	//raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);
 
 	ShaderPassComposer * composer = new ShaderPassComposer();

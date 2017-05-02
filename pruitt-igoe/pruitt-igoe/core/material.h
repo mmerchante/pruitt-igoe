@@ -33,6 +33,15 @@ public:
         BlendOperation(GLenum source, GLenum destination) : source(source), destination(destination){}
     };
 
+	struct StencilOperation
+	{
+		GLuint mask;
+		GLenum operation;
+		GLenum pass;
+		GLenum fail;
+		GLenum zFail;
+	};
+
     Material(Shader * shader);
     Material(std::string shader);
 
@@ -56,6 +65,9 @@ public:
     bool GetFeature(GLenum id);
 
     void SetBlendOperation(BlendOperation op);
+	void SetStencilOperation(StencilOperation op);
+
+	void SetDepthWrite(bool write);
 
     void SetRenderingQueue(RenderingQueue queue);
     RenderingQueue GetRenderingQueue();
@@ -78,9 +90,11 @@ protected:
 	};
 
 	BlendOperation blendOperation;
+	StencilOperation stencilOperation;
 	int overrideDrawingMode;
 	RenderingQueue queue;
 	Shader * shader;
+	bool depthWrite;
 
 	// Mainly for blending, depth testing, etc...
 	std::unordered_map<GLenum, bool> featureMap;

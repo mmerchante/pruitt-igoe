@@ -55,7 +55,7 @@ protected:
 class RenderTexture : public Texture
 {
 public:
-	RenderTexture(int width, int height, bool depth, int precision, TextureParameters p);
+	RenderTexture(int width, int height, bool stencil, TextureParameters p);
 	virtual ~RenderTexture();
 
 	GLuint GetFramebufferID();
@@ -69,8 +69,7 @@ protected:
 	GLuint framebufferID;
 	GLuint depthbufferID;
 	std::vector<GLenum> drawBuffers;
-	bool depth;
-	int precision;
+	bool stencil;
 };
 
 #endif // TEXTURE_H

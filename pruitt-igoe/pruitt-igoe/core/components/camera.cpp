@@ -21,6 +21,7 @@ void Camera::Awake()
 	this->mask = CullingMask::Default;
 	this->clearColor = true;
 	this->clearDepth = true;
+	this->clearStencil = false;
 
     Engine::GetInstance()->RegisterCamera(this);
 }
@@ -97,15 +98,24 @@ void Camera::Render()
 	}
 
 	int flags = 0;
+	
 	if (clearColor)
 		flags |= GL_COLOR_BUFFER_BIT;
 
 	if(clearDepth)
 		flags |= GL_DEPTH_BUFFER_BIT;
 
+	if (clearStencil)
+		flags |= GL_STENCIL_BUFFER_BIT;
+
 	if (flags)
 	{
+		glStencilMask(0xFF);
+		glDepthMask(GL_TRUE);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
 		glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, backgroundColor.z);
+		glClearStencil(0);
 		glClearDepth(1.f);
 		glClear(flags);
 	}
@@ -172,6 +182,7 @@ void UICamera::Awake()
     this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
 	this->clearColor = false;
 	this->clearDepth = false; // UI draws over everything
+	this->clearStencil = false;
 }
 
 UICamera::~UICamera()

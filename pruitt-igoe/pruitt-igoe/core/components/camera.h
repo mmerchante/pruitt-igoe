@@ -42,6 +42,7 @@ public:
 	glm::vec4 backgroundColor;
 	bool clearDepth;
 	bool clearColor;
+	bool clearStencil;
 	CullingMask mask;
 
 protected:

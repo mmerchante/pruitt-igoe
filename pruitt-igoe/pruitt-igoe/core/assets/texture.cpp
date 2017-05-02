@@ -102,7 +102,7 @@ void Texture::LoadFromFilename(const std::string & filename, const TextureParame
 	LoadFromRaw(pixels, image.getSize().x, image.getSize().y, p);
 }
 
-RenderTexture::RenderTexture(int width, int height, bool depth, int precision, TextureParameters p) : Texture(), depth(depth), precision(precision)
+RenderTexture::RenderTexture(int width, int height, bool stencil, TextureParameters p) : Texture(), stencil(stencil)
 {
 	this->width = width;
 	this->height = height;
@@ -139,8 +139,11 @@ void RenderTexture::Load()
 	// Texture generation
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+/*
+	if(stencil)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_RGBA, NULL);
+	else*/
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, parameters.minFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, parameters.magFilter);
@@ -158,8 +161,18 @@ void RenderTexture::Load()
 	// Depth buffer
 	glGenRenderbuffers(1, &depthbufferID);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthbufferID);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbufferID);
+
+	if (stencil)
+	{
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbufferID);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthbufferID);
+	}
+	else
+	{
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbufferID);
+	}
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureID, 0);
 
