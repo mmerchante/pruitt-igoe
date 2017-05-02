@@ -5,25 +5,18 @@
 
 void Terrain::Awake()
 {
-	int heightmapSize = 1024;
+	int heightmapSize = 2048;
 	int approxHeightmapSize = heightmapSize;
 
-	float maxHeight = 512.f;
-
-	TerrainGenerator lowFrequencyGenerator;
-	lowFrequencyGenerator.SetBaseGenerator(new FractalGenerator(2, 1.5f, 2.15f, .55f, maxHeight * 1.25f));
-
-	float * approxTerrain = lowFrequencyGenerator.Generate(approxHeightmapSize, approxHeightmapSize);
-	glm::vec3 * approxTerrainGradient = GetNormalMap(approxTerrain, approxHeightmapSize, approxHeightmapSize);
+	float maxHeight = 275.f;
 
 	TerrainGenerator generator;
-	FractalGenerator * advGen = new FractalGenerator(12, 1.5f, 2.15f, .55f, maxHeight);
-	advGen->SetNormalMap(approxTerrainGradient, approxHeightmapSize);
+	FractalGenerator * advGen = new FractalGenerator(9, 1.5f, 2.2f, .490f, maxHeight);
 	generator.SetBaseGenerator(advGen);
 
 	float * rawTerrain = generator.Generate(heightmapSize, heightmapSize);
 
-	int resolutionDownsampling = 8;
+	int resolutionDownsampling = 4;
 	int width = heightmapSize / resolutionDownsampling;
 	int height = heightmapSize / resolutionDownsampling;
 
@@ -39,11 +32,11 @@ void Terrain::Awake()
 		int srcY = dstY * resolutionDownsampling;
 
 		int srcIndex = srcY * heightmapSize + srcX;
-		hpHeightmap[i] = rawTerrain[srcIndex] * 1.025;
+		hpHeightmap[i] = rawTerrain[srcIndex];
 	}
 
 	float verticalScale = 1.f;
-	float scale = .75f;
+	float scale = .75f * .5f;
 	
 	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolutionDownsampling);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
@@ -53,13 +46,10 @@ void Terrain::Awake()
 
 	// Match the raymarched terrain with the mesh
 	this->GetTransform()->SetLocalScale(glm::vec3(scale, 1.f, scale));
-	//this->GetTransform()->SetLocalScale(glm::vec3(heightmap->GetWidth(), 1, heightmap->GetHeight()));
 	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmapSize, verticalScale, 1.f / heightmapSize, 0.f));
-
-	//Texture * readOnlyHeightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
-
+	
 	Texture * fpTexture = new Texture();
-	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
+	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
 	this->floatingPointHeightmap = fpTexture;
 	this->material->SetTexture("Heightfield", fpTexture);
@@ -69,6 +59,7 @@ void Terrain::Awake()
 		GameObject * wireframeGO = GameObject::Instantiate("wireframeTerrain");
 		MeshRenderer * wireframeRenderer = wireframeGO->AddComponent<MeshRenderer>();
 		wireframeRenderer->SetMesh(terrainMesh);
+		wireframeGO->GetTransform()->SetLocalScale(glm::vec3(scale, 1.f, scale));
 
 		Material * wireframeMat = new Material("terrain/wireframe");
 		wireframeMat->SetColor("Color", glm::vec4(.1, .1, .1, 1.0f));

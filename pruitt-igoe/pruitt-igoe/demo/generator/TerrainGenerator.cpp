@@ -39,8 +39,7 @@ void TerrainGenerator::SetBaseGenerator(BaseGenerator * gen)
 }
 
 FractalGenerator::FractalGenerator(int octaves, float frequency, float frequencyMultiplier, float amplitudeMultiplier, float amplitude)
-	: BaseGenerator(), octaves(octaves), frequency(frequency), frequencyMultiplier(frequencyMultiplier), amplitudeMultiplier(amplitudeMultiplier), amplitude(amplitude),
-	terrainNormalMap(nullptr)
+	: BaseGenerator(), octaves(octaves), frequency(frequency), frequencyMultiplier(frequencyMultiplier), amplitudeMultiplier(amplitudeMultiplier), amplitude(amplitude)
 {
 }
 
@@ -99,10 +98,12 @@ float FractalGenerator::perlin2D(float x, float y)
 	int BA = p[B];
 	int BB = p[B + 1];
 
-	// Ridged noise
-	return abs(glm::mix(glm::mix(grad(p[AA], x, y    ), grad(p[BA], x - 1, y    ), u),
-						glm::mix(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u), 
-						v)) / .707f;
+	// [-1,1]
+	float output = glm::mix(glm::mix(grad(p[AA], x, y), grad(p[BA], x - 1, y), u),
+				   glm::mix(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u),
+				   v) / .707f;
+
+	return abs(output);
 }
 
 float FractalGenerator::fbm(float x, float y)
@@ -136,79 +137,72 @@ float bias(float x, float b)
 	return glm::smoothstep(b, 1.0f - b, x);
 }
 
-
 // Not thread safe!
 float octaveData[32] = { 0 };
+float gradientData[32] = { 0 };
 
 float FractalGenerator::advFractal(float x, float y)
 {
 	float accum = 0.f;
+	float result = 0.f;
 	float freq = this->frequency;
 	float ampl = this->amplitude;
-	float result = 0.f;
-
-	int nX = x * terrainNormalMapSize;
-	int nY = y * terrainNormalMapSize;
-
-	glm::vec3 gradient = terrainNormalMap[nY * terrainNormalMapSize + nX];
-
-	float steepness = glm::smoothstep(0.1f, 1.f, glm::abs(gradient.z * .5f + .5f));
 
 	glm::vec2 p = glm::vec2(x, y);
-
-	float gx = gradient.x * gradient.x + gradient.y * gradient.y;
-
 	glm::vec2 dsum;
-	float eps = .01;
+
+	float eps = .1;
 	for (int i = 0; i < this->octaves; i++)
 	{
 		glm::vec2 estimatedNormal = glm::vec2(perlin2D((p.x + eps) * freq, p.y * freq) - perlin2D((p.x - eps) * freq, p.y * freq),
 							  perlin2D(p.x * freq, (p.y + eps) * freq) - perlin2D(p.x * freq, (p.y - eps) * freq));
 
-		estimatedNormal = glm::normalize(estimatedNormal);
+		gradientData[i] = glm::length2(estimatedNormal);
 
-		dsum += estimatedNormal;
+		if (glm::length2(estimatedNormal) == 0.0f)
+			estimatedNormal = glm::vec2(1.f);
+
+		if (i > 3)
+		{
+			dsum += estimatedNormal;
+		}
 
 		float r = perlin2D(p.x * freq, p.y * freq);
-		r = glm::pow(r, 2.1f) * ampl;
-		
-		r *= 1.f / (1.f + glm::dot(dsum, dsum));
+		r = glm::pow(r, 1.75f);
+		r *= ampl / (1.0f + glm::dot(dsum, dsum));
 
 		octaveData[i] = r;
 		result += r;
 		accum += ampl;
 
-		//if (i == 0)
-			//steepness += ((r / ampl) * .2 - .1) * .1;
-/*
-		freq *= this->frequencyMultiplier;
-		ampl *= this->amplitudeMultiplier;
-*/
-
-		glm::vec3 vN = glm::normalize(glm::vec3(dsum.x, dsum.y, .5f));
-
-		float frequencyModulator = glm::clamp(vN.z * vN.z + sin((dsum.x + dsum.y) * 3.14f ) *.015f + .1f, 0.f, 1.f);
-
-		freq *= glm::mix(frequencyMultiplier * .9f, frequencyMultiplier, frequencyModulator);
-		ampl *= glm::mix(amplitudeMultiplier * .9f, amplitudeMultiplier, frequencyModulator);
+		if (i <= 3)
+		{
+			freq *= this->frequencyMultiplier;
+			ampl *= this->amplitudeMultiplier;
+		}
+		else
+		{
+			float frequencyModulator = glm::smoothstep(0.f, 1.f, glm::clamp(glm::dot(estimatedNormal, estimatedNormal), 0.f, 1.f));
+			freq *= glm::mix(frequencyMultiplier * .9f, frequencyMultiplier, frequencyModulator);
+			ampl *= glm::mix(amplitudeMultiplier * .9f, amplitudeMultiplier, frequencyModulator);
+		}
 	}
 
-	glm::vec3 tangent = glm::vec3(-gradient.y, gradient.x, gradient.z);
-
-	float dot = x * -dsum.y + y * dsum.x;
-	float ridges = glm::sin(dot * 16.f) * steepness * .05f + 1.f;
-	result = (result - octaveData[0]) * ridges + octaveData[0];
+	// Some erosion inspired ridges
+	float ridges = glm::sin(gradientData[2] * 14.f) * .05f + 1.f;
+	result *= ridges;
 
 	if (accum == 0.f)
 		accum = 1.f;
 
 	// Normalization and bias
 	result = result / accum;
-	result = glm::pow(result, 1.35f);
+	result = glm::pow(result, 1.15f);
 
-/*
-	float terrace = (int)(result * 8) / 8.f + glm::smoothstep(0.f, 1.f, glm::fmod(result * 8.f, 8.f) / 8.f) * .5f;
-	result = glm::mix(result, terrace, .25f);*/	
+	int terraceCount = 4;
+	float terrace = (int)(result * terraceCount) /((float)terraceCount) + 
+		glm::smoothstep(0.f, 1.f, glm::fmod(result * ((float)terraceCount), ((float)terraceCount)) / ((float)terraceCount)) * .85f;
+	result = glm::mix(result, terrace, .15f);
 	
 	return result * amplitude - amplitude * .5f;
 }
@@ -224,22 +218,8 @@ void FractalGenerator::Generate(float * terrain, int width, int height)
 	float invW = 1.f / width;
 	float invH = 1.f / height;
 
-	if(terrainNormalMap == nullptr)
-	{
-		for (int y = 0; y < height; y++)
-			for (int x = 0; x < width; x++)
-				terrain[y * width + x] = fbm(x * invW, y * invH);
-	}
-	else
-	{
-		for (int y = 0; y < height; y++)
-			for (int x = 0; x < width; x++)
-				terrain[y * width + x] = advFractal(x * invW, y * invH);
-	}
+	for (int y = 0; y < height; y++)
+		for (int x = 0; x < width; x++)
+			terrain[y * width + x] = advFractal(x * invW, y * invH);
 }
 
-void FractalGenerator::SetNormalMap(glm::vec3 * normalMap, int size)
-{
-	this->terrainNormalMap = normalMap;
-	this->terrainNormalMapSize = size;
-}

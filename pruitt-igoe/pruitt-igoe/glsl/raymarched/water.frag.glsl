@@ -12,14 +12,40 @@
 
 #include <Raymarching>
 
+uniform sampler2D RandomTexture;
 uniform sampler2D ReflectedHeightfield;
 uniform vec4 TerrainScale; // Scaling in the sdf to prevent transformation errors
-uniform float Time;
-  
+uniform float Time;  
+
+float noise( in vec3 x )
+{
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+	f = f*f*(3.0-2.0*f);
+	
+	vec2 uv = x.xz;
+	vec3 rg = texture2D(RandomTexture, (uv + 0.5) / 512.0).rgb;
+	return mix(rg.x, rg.y, rg.z );
+}
+
+// Both noise and fractal from iq's hell shadertoy: https://www.shadertoy.com/view/MdfGRX
+float fractal(vec3 p)
+{
+	float f;
+	vec3 q = p                          - vec3(0.0,1.0,0.0)*Time;
+    f  = 0.50000*noise( q ); q = q*2.02 - vec3(0.0,1.0,0.0)*Time;
+    f += 0.25000*noise( q ); q = q*2.03 - vec3(0.0,1.0,0.0)*Time;
+    f += 0.12500*noise( q ); q = q*2.01 - vec3(0.0,1.0,0.0)*Time;
+    f += 0.06250*noise( q ); q = q*2.02 - vec3(0.0,1.0,0.0)*Time;
+    f += 0.03125*noise( q );
+
+	return f;
+}
+
 float sceneReflections(vec3 point)
 { 
 	vec2 uv = point.xz * TerrainScale.xz / .75;
-	float h = textureLod(ReflectedHeightfield, uv, 3).r;	
+	float h = textureLod(ReflectedHeightfield, uv, 1).r;	
 	float d = (point.y - h);
 	return d;
 } 
@@ -60,23 +86,21 @@ float scene(vec3 point)
 	return point.y;
 }
 
-//vec3 shadeReflections(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
-//{
-//	vec3 l = normalize(vec3(1.0));
-//	float diffuse = clamp(dot(normal, l), 0.0, 1.0);
-//	return vec3(diffuse);
-//}
-
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 {
 	vec3 l = normalize(vec3(1.0));
 	float diffuse = clamp(dot(-normal, l), 0.0, 1.0);
 
-	normal = vec3(sin((point.x + point.z) * .85 + Time * 4.0) * .015 + .1, 1.0, 0.0);
-	//normal.xz += sin(length(point.xz - vec2(412.0, 400))) * .2 - .2;
+	normal = normalize(normal + vec3(sin(point.x + point.z) *.001 + fractal(point * .5 + Time) * .1));
+	//normal = vec3(sin((point.x + point.z) * .85 + Time * 4.0) * .015 + .1, 1.0, 0.0);
+
+	normal += rayDirection * .2;
+
+	float waveCenter = length(point.xz - vec2(412.0, 400));
+	normal.xz += (sin(fractal(point * .2) * 2.4 + waveCenter - Time * 10.0) * .3 - .3) * (1.0 - saturate(waveCenter * .05));
 
 	vec3 refl = reflect(rayDirection, normalize(normal));
-	refl.y = abs(refl.y) * .5;
+	refl.y = abs(refl.y) * .85;
  
 	return reflections(point, normalize(refl), 100.f);
 }

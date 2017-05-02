@@ -21,7 +21,8 @@ void main()
 {
 	// Inflate the mesh
 	vec4 p = Model * vertexPosition;
-	p.xyz += vertexNormal.xyz * 50.0f;
+	p.y += 5.0f;
+	p.xyz += vertexNormal.xyz * 5.0f;
 
 	vertexData.localVertexPosition = (ModelInv * vec4(p.xyz, 1.0)).xyz;
 	vertexData.localCameraPosition = (ModelInv * vec4(CameraPosition.xyz, 1.0)).xyz;
