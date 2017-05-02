@@ -7,6 +7,7 @@ class Terrain : public Component
 public:
 	void Awake();
 	Material * material;
+	Texture * floatingPointHeightmap;
 
 protected:
 	Mesh * GenerateMesh(float * heightmap, int width, int height, float scale, float resolution);

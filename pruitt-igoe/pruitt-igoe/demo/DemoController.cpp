@@ -63,6 +63,17 @@ void DemoController::Awake()
 	secondaryTerrain->material->SetStencilOperation(stencilTerrainSecondary);
 
 
+	GameObject * waterGO = GameObject::Instantiate("water");
+	waterGO->GetTransform()->SetLocalPosition(glm::vec3(0.f, -255.f, 0.f));
+	waterGO->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(-90.f), 0.f, 0.f));
+	waterGO->GetTransform()->SetLocalScale(glm::vec3(1000.f));
+	MeshRenderer * waterRenderer = waterGO->AddComponent<MeshRenderer>();
+	waterRenderer->SetMesh(MeshFactory::BuildQuad());
+	Material * waterMaterial = new Material("raymarched/water");
+	waterMaterial->SetTexture("ReflectedHeightfield", terrain->floatingPointHeightmap);
+	waterMaterial->SetVector("TerrainScale", glm::vec4(1.f / 1024.f, 1.f, 1.f / 1024.f, 0.f));
+	waterRenderer->SetMaterial(waterMaterial);
+
 /*
 	GameObject * lightPillar = GameObject::Instantiate("lightPillar");
 	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
@@ -76,6 +87,7 @@ void DemoController::Awake()
 
 	//raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);
+	raymarchedMaterials.push_back(waterMaterial);
 	raymarchedMaterials.push_back(secondaryTerrain->material);
 
 	ShaderPassComposer * composer = new ShaderPassComposer();

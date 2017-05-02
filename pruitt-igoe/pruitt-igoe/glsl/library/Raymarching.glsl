@@ -5,6 +5,14 @@
 // Conservative depth testing
 layout (depth_greater) out float gl_FragDepth;
 
+#ifdef REFLECTIONS
+// - sceneReflections: the raymarched sdf for reflections, which can be different than the object's sdf
+float sceneReflections(vec3 point);
+
+// - shadeReflections:  the output color of the reflected scene
+vec3 shadeReflections(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t);
+#endif
+
 // - shade:  the output color
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t);
 
@@ -87,6 +95,73 @@ in VertexData vertexData;
 
 layout(location = 0) out vec4 out_Col;
 
+#ifdef REFLECTIONS
+
+vec3 estimateSceneGradientReflections(vec3 point, float epsilon)
+{
+	vec3 e = vec3(epsilon, -epsilon, 0);
+
+	float x = sceneReflections(vec3(point.x + epsilon, point.y, point.z));
+	x -= sceneReflections(vec3(point.x - epsilon, point.y, point.z));
+
+	float y = sceneReflections(vec3(point.x, point.y + epsilon, point.z));
+	y -= sceneReflections(vec3(point.x, point.y - epsilon, point.z));
+
+	float z = sceneReflections(vec3(point.x, point.y, point.z + epsilon));
+	z -= sceneReflections(vec3(point.x, point.y, point.z - epsilon));
+
+	return normalize(vec3(x,y,z));
+}
+
+// Note: Reflections are calculated in world space
+vec3 reflections(vec3 origin, vec3 direction, float initialOffset)
+{
+	vec3 rayOrigin = origin;
+	vec3 rayDir = direction;
+    float t = initialOffset;
+		
+    vec3 color = vec3(0.0);
+    vec3 current = rayOrigin + rayDir * t;
+
+	float d = CameraParameters.y;
+	bool hit = false;
+
+#ifdef DEBUG_REFLECTIONS
+    float iterationCount = 0.0;
+#endif
+
+	for(int j = 0; j < REFLECTION_ITERATIONS; j++)
+	{
+		d = sceneReflections(current);
+		t += d;
+		current += rayDir * d;
+
+		if(d < REFLECTION_EPSILON)
+		{
+			hit = true;
+			break;
+		}
+
+#ifdef DEBUG_REFLECTIONS
+		iterationCount += 1.0;
+#endif
+	}
+
+	if(hit)
+	{
+	#ifdef DEBUG_REFLECTIONS
+		color  = debugIterations(iterationCount / float(MAX_ITERATIONS));
+	#else
+		vec3 normal = estimateSceneGradientReflections(current, NORMAL_ESTIMATION_EPSILON);
+		color = shadeReflections(current, normal, rayOrigin, rayDir, t);
+	#endif
+		return color;
+	}
+
+	return vec3(1.0);
+}
+#endif
+
 #ifdef SHADOWS
 // Reference: http://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
 float shadows(vec3 origin, vec3 lightPosition)
@@ -142,14 +217,14 @@ void main()
 	{
 		d = scene(current);
 
-		t += d;
-		current += rayDir * d;
-
 		if(d < EPSILON)
 		{
 			hit = true;
 			break;
 		}
+
+		t += d;
+		current += rayDir * d;
 
 #ifdef DEBUG
 		iterationCount += 1.0;
@@ -165,11 +240,11 @@ void main()
 		{
 			d = scene(current);
 	
-			t += d;
-			current += rayDir * d;
 
 			if(d <= 0)
 				break;
+			t += d;
+			current += rayDir * d;
 		}
 
 #ifdef DEBUG

@@ -17,7 +17,7 @@
 //#define DEBUG
 
 #include <Raymarching>
-
+ 
 uniform sampler2D Heightfield;
 uniform sampler2D HeightfieldNormal;
 
@@ -28,7 +28,7 @@ float scene(vec3 point)
 {
 	vec2 uv = point.xz * TerrainScale.xz;
 	//vec3 n = texture2D(HeightfieldNormal, uv).rgb * 2.0 - vec3(1.0);
-
+ 
 	//float angle = atan(n.y, n.x) ;
 	//float deriv = (1.0 - smoothstep(n.z - .1, n.z, .8)) * sin((angle + uv.x + uv.y) * .5) * .5 + .5;
 

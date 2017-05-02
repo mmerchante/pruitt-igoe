@@ -59,12 +59,10 @@ void Terrain::Awake()
 	//Texture * readOnlyHeightmap = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/heightfield_3.png", TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
 
 	Texture * fpTexture = new Texture();
-	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
-	//Texture * heightmapNormal = GetNormalMap(rawTerrain, heightmapSize, heightmapSize);
-
+	this->floatingPointHeightmap = fpTexture;
 	this->material->SetTexture("Heightfield", fpTexture);
-	//this->material->SetTexture("HeightfieldNormal", heightmapNormal);
 
 	if (SHOW_WIREFRAME)
 	{

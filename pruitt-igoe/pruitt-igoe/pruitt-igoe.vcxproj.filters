@@ -214,5 +214,7 @@
     <None Include="glsl\raymarched\light_pillar.frag.glsl" />
     <None Include="glsl\raymarched\light_pillar.vert.glsl" />
     <None Include="glsl\library\Raymarching.glsl" />
+    <None Include="glsl\raymarched\water.frag.glsl" />
+    <None Include="glsl\raymarched\water.vert.glsl" />
   </ItemGroup>
 </Project>

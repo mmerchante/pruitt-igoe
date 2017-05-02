@@ -205,6 +205,8 @@
     <None Include="glsl\pennFlag.vert.glsl" />
     <None Include="glsl\raymarched\light_pillar.frag.glsl" />
     <None Include="glsl\raymarched\light_pillar.vert.glsl" />
+    <None Include="glsl\raymarched\water.frag.glsl" />
+    <None Include="glsl\raymarched\water.vert.glsl" />
     <None Include="glsl\shadingPass.frag.glsl" />
     <None Include="glsl\shadingPass.vert.glsl" />
     <None Include="glsl\terrain.frag.glsl" />
