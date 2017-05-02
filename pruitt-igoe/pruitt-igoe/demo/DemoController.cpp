@@ -19,8 +19,8 @@ void DemoController::Awake()
 	this->cameraController->camera->clearStencil = true;
 
 	GameObject * portalGO = GameObject::Instantiate("portal");
-	portalGO->GetTransform()->SetLocalScale(glm::vec3(512.f));
-	portalGO->GetTransform()->SetLocalPosition(glm::vec3(512, 0.f, 512));
+	portalGO->GetTransform()->SetLocalScale(glm::vec3(50.f, 150.f, 20.f));
+	portalGO->GetTransform()->SetLocalPosition(glm::vec3(256.f, 0.f, 256.f));
 	MeshRenderer * portalRenderer = portalGO->AddComponent<MeshRenderer>();
 	portalRenderer->SetMesh(MeshFactory::BuildCube(true));
 	Material * portalMaterial = new Material("flat");
@@ -41,12 +41,26 @@ void DemoController::Awake()
 
 	Material::StencilOperation stencilTerrain;
 	stencilTerrain.mask = 0x00;
-	stencilTerrain.operation = GL_EQUAL;
+	stencilTerrain.operation = GL_NOTEQUAL;
 	stencilTerrain.fail = GL_KEEP;
 	stencilTerrain.zFail = GL_KEEP;
 	stencilTerrain.pass = GL_KEEP;
 	this->terrain->material->SetFeature(GL_STENCIL_TEST, true);
 	this->terrain->material->SetStencilOperation(stencilTerrain);
+
+	GameObject * secondaryTerrainGO = GameObject::Instantiate("terrain");
+	Terrain * secondaryTerrain = secondaryTerrainGO->AddComponent<Terrain>();
+	secondaryTerrain->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(180.f), 0.f, 0.f));
+	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(0, 100.f, 1024.f));
+
+	Material::StencilOperation stencilTerrainSecondary;
+	stencilTerrainSecondary.mask = 0x00;
+	stencilTerrainSecondary.operation = GL_EQUAL;
+	stencilTerrainSecondary.fail = GL_KEEP;
+	stencilTerrainSecondary.zFail = GL_KEEP;
+	stencilTerrainSecondary.pass = GL_KEEP;
+	secondaryTerrain->material->SetFeature(GL_STENCIL_TEST, true);
+	secondaryTerrain->material->SetStencilOperation(stencilTerrainSecondary);
 
 
 /*
@@ -62,6 +76,7 @@ void DemoController::Awake()
 
 	//raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);
+	raymarchedMaterials.push_back(secondaryTerrain->material);
 
 	ShaderPassComposer * composer = new ShaderPassComposer();
 	composer->SetSourceTarget(raymarchingTarget);

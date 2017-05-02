@@ -5,23 +5,25 @@
 
 void Terrain::Awake()
 {
-	int heightmapSize = 2048;
+	int heightmapSize = 1024;
 	int approxHeightmapSize = heightmapSize;
 
+	float maxHeight = 512.f;
+
 	TerrainGenerator lowFrequencyGenerator;
-	lowFrequencyGenerator.SetBaseGenerator(new FractalGenerator(2, 1.5f, 2.15f, .5f, 375.f));
+	lowFrequencyGenerator.SetBaseGenerator(new FractalGenerator(2, 1.5f, 2.15f, .55f, maxHeight * 1.25f));
 
 	float * approxTerrain = lowFrequencyGenerator.Generate(approxHeightmapSize, approxHeightmapSize);
 	glm::vec3 * approxTerrainGradient = GetNormalMap(approxTerrain, approxHeightmapSize, approxHeightmapSize);
 
 	TerrainGenerator generator;
-	FractalGenerator * advGen = new FractalGenerator(12, 1.5f, 2.15f, .5f, 300.f);
+	FractalGenerator * advGen = new FractalGenerator(12, 1.5f, 2.15f, .55f, maxHeight);
 	advGen->SetNormalMap(approxTerrainGradient, approxHeightmapSize);
 	generator.SetBaseGenerator(advGen);
 
 	float * rawTerrain = generator.Generate(heightmapSize, heightmapSize);
 
-	int resolutionDownsampling = 32;
+	int resolutionDownsampling = 8;
 	int width = heightmapSize / resolutionDownsampling;
 	int height = heightmapSize / resolutionDownsampling;
 
@@ -41,7 +43,7 @@ void Terrain::Awake()
 	}
 
 	float verticalScale = 1.f;
-	float scale = .5f;
+	float scale = .75f;
 	
 	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolutionDownsampling);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();

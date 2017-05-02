@@ -85,8 +85,8 @@ float FractalGenerator::perlin2D(float x, float y)
 	int Y = y;		
 	x -= X;
 	y -= Y;
-	X = X % 255;
-	Y = Y % 255;
+	X = X - (X / 255) * 255 + (X < 0 ? 255 : 0);
+	Y = Y - (Y / 255) * 255 + (Y < 0 ? 255 : 0);
 
 	float u = fade1(x);
 	float v = fade1(y);
@@ -101,8 +101,8 @@ float FractalGenerator::perlin2D(float x, float y)
 
 	// Ridged noise
 	return abs(glm::mix(glm::mix(grad(p[AA], x, y    ), grad(p[BA], x - 1, y    ), u),
-					glm::mix(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u), 
-					v)) / .707f;
+						glm::mix(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u), 
+						v)) / .707f;
 }
 
 float FractalGenerator::fbm(float x, float y)
@@ -152,33 +152,51 @@ float FractalGenerator::advFractal(float x, float y)
 
 	glm::vec3 gradient = terrainNormalMap[nY * terrainNormalMapSize + nX];
 
-	float steepness = glm::smoothstep(0.f, 1.f, glm::abs(gradient.y * gradient.y * gradient.y));
+	float steepness = glm::smoothstep(0.1f, 1.f, glm::abs(gradient.z * .5f + .5f));
 
 	glm::vec2 p = glm::vec2(x, y);
 
+	float gx = gradient.x * gradient.x + gradient.y * gradient.y;
+
+	glm::vec2 dsum;
+	float eps = .01;
 	for (int i = 0; i < this->octaves; i++)
 	{
-		float r = glm::pow(bias(perlin2D(p.x * freq, p.y * freq), 0.1), 1.5f) * ampl;
+		glm::vec2 estimatedNormal = glm::vec2(perlin2D((p.x + eps) * freq, p.y * freq) - perlin2D((p.x - eps) * freq, p.y * freq),
+							  perlin2D(p.x * freq, (p.y + eps) * freq) - perlin2D(p.x * freq, (p.y - eps) * freq));
+
+		estimatedNormal = glm::normalize(estimatedNormal);
+
+		dsum += estimatedNormal;
+
+		float r = perlin2D(p.x * freq, p.y * freq);
+		r = glm::pow(r, 2.1f) * ampl;
+		
+		r *= 1.f / (1.f + glm::dot(dsum, dsum));
+
 		octaveData[i] = r;
 		result += r;
 		accum += ampl;
 
 		//if (i == 0)
-			steepness += ((r / ampl) * .2 - .1) * .1;
+			//steepness += ((r / ampl) * .2 - .1) * .1;
+/*
+		freq *= this->frequencyMultiplier;
+		ampl *= this->amplitudeMultiplier;
+*/
 
-		//freq *= this->frequencyMultiplier;
-		//ampl *= this->amplitudeMultiplier;
+		glm::vec3 vN = glm::normalize(glm::vec3(dsum.x, dsum.y, .5f));
 
-		float frequencyModulator = glm::clamp(steepness + sin((steepness + gradient.z + gradient.x) * 8.0f ) *.01f + .25f, 0.f, 1.f);
+		float frequencyModulator = glm::clamp(vN.z * vN.z + sin((dsum.x + dsum.y) * 3.14f ) *.015f + .1f, 0.f, 1.f);
 
-		freq *= glm::mix(frequencyMultiplier * .985f, frequencyMultiplier, frequencyModulator);
-		ampl *= glm::mix(amplitudeMultiplier * .925f, amplitudeMultiplier, frequencyModulator);
+		freq *= glm::mix(frequencyMultiplier * .9f, frequencyMultiplier, frequencyModulator);
+		ampl *= glm::mix(amplitudeMultiplier * .9f, amplitudeMultiplier, frequencyModulator);
 	}
 
-	glm::vec3 tangent = glm::vec3(-gradient.z, gradient.y, gradient.x);
+	glm::vec3 tangent = glm::vec3(-gradient.y, gradient.x, gradient.z);
 
-	float dot = x * gradient.x + y * gradient.z;
-	float ridges = glm::sin(dot * 25.f + result * .025 + octaveData[2] * .05 + octaveData[5] * .025) * steepness * .1f + 1.f;
+	float dot = x * -dsum.y + y * dsum.x;
+	float ridges = glm::sin(dot * 16.f) * steepness * .05f + 1.f;
 	result = (result - octaveData[0]) * ridges + octaveData[0];
 
 	if (accum == 0.f)
