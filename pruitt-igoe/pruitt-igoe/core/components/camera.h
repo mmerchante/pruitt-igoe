@@ -39,6 +39,7 @@ public:
 	void SetRenderTexture(RenderTexture * rt);
 	RenderTexture * GetRenderTexture();
 
+	glm::vec4 viewport;
 	glm::vec4 backgroundColor;
 	bool clearDepth;
 	bool clearColor;

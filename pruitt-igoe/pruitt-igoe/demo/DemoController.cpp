@@ -15,10 +15,12 @@ void DemoController::Awake()
 	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(1024, 64, 512));
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
 	this->cameraController->camera->SetRenderTexture(raymarchingTarget);
-	this->cameraController->camera->backgroundColor = glm::vec4(.9, .95, 1.0, 1.0);
+	this->cameraController->camera->backgroundColor = glm::vec4(0.f, 0.f, 0.f, 1.0);
 	this->cameraController->camera->SetFarClip(2000);
 	this->cameraController->camera->SetNearClip(10);
 	this->cameraController->camera->clearStencil = true;
+	this->cameraController->camera->SetFieldOfView(25.f);
+	this->cameraController->camera->viewport = glm::vec4(0.f, 120.f, 0.f, 240.f);
 
 	GameObject * portalGO = GameObject::Instantiate("portal");
 	portalGO->GetTransform()->SetLocalScale(glm::vec3(10.f, 50.f, 30.f));
@@ -66,9 +68,9 @@ void DemoController::Awake()
 */
 
 	GameObject * waterGO = GameObject::Instantiate("water");
-	waterGO->GetTransform()->SetLocalPosition(glm::vec3(512.f, -90.f, 512.f));
+	waterGO->GetTransform()->SetLocalPosition(glm::vec3(625, -90.f, 472));
 	waterGO->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(-90.f), 0.f, 0.f));
-	waterGO->GetTransform()->SetLocalScale(glm::vec3(1000.f));
+	waterGO->GetTransform()->SetLocalScale(glm::vec3(180, 180, 1));
 	MeshRenderer * waterRenderer = waterGO->AddComponent<MeshRenderer>();
 	waterRenderer->SetMesh(MeshFactory::BuildQuad());
 	Material * waterMaterial = new Material("raymarched/water");

@@ -35,6 +35,7 @@ float scene(vec3 point)
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 { 
 	vec2 uv = point.xz * TerrainScale.xz;
+	float vignette = smoothstep(.85, .9, 1.0 - length(uv - vec2(.25)));
 	float snow = saturate(smoothstep(.6, .65, normal.y) - step(-35.0, point.y));
 
 	vec3 lightPosition = vec3(512.0, 50, 512.0);
@@ -47,7 +48,7 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	float rim = pow(1.0 - dot(rayDirection, -normal), 3.0);
 
 	float diffuse = pow(smoothstep(0.0, 1.0, cosTheta * .5 + .5), 3.0) * .25 + .25 + rim * .5;
-	float ambient = .04f + rim * .0075 - saturate(-cosTheta) * .13;
+	float ambient = .04f + rim * .0075 - saturate(-cosTheta) * .13 ;
 	float specular = pow(saturate(dot(refl, lightDirection)), 1.5) * (1.0 - snow) * .15 * diffuse;
 
 	vec3 amb = vec3(.2, .5, .9);
@@ -56,7 +57,9 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	vec3 shadow = mix(vec3(.1, .35, .9), vec3(1.0), shadows(point - normal * 1.0, lightPosition));
 
 	vec3 outColor = terrainColor * diffuse + amb * specular + amb * ambient;
-	outColor = mix(outColor, amb * 2.0, saturate(-.15 + t / 400.0)) * shadow;// + amb * saturate(-cosTheta) * .15;
+	outColor = mix(outColor, amb * 2.0, saturate(-.15 + t / 400.0)) * shadow;
 
-	return outColor * falloff;// + vec3(1.0, .25, 0.0) * smoothstep(abs(tex), abs(tex) + 2.0, 5.0) * 1.5;
+	//falloff *= smoothstep(.85, .9, 1.0 - length(uv - vec2(.25)));
+
+	return outColor * falloff;
 }

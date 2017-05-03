@@ -10,6 +10,7 @@
 //#define DEBUG_REFLECTIONS
 #define REFLECTIONS
 #define ENABLE_ALPHA
+#define CUSTOM_BACKGROUND
 
 #include <Raymarching>
 
@@ -17,6 +18,11 @@ uniform sampler2D RandomTexture;
 uniform sampler2D ReflectedHeightfield;
 uniform vec4 TerrainScale; // Scaling in the sdf to prevent transformation errors
 uniform float Time;  
+
+vec3 sceneBackground()
+{
+	return vec3(.1, .35, .9) * .075;
+}
 
 float noise( in vec3 x )
 {
@@ -95,7 +101,6 @@ float scene(vec3 point)
 
 vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 {
-
 	vec2 uv = point.xz * TerrainScale.xz / .75;
 	float h = textureLod(ReflectedHeightfield, uv, 1).r;
 	h += 90.0;
@@ -109,8 +114,8 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 
 	normal += rayDirection * .2;
 
-	float waveCenter = length(point.xz - vec2(700.0, 512));
-	normal.xz += (sin(fractal(point * .2) * 2.4 + waveCenter - Time * 10.0) * .3 - .3) * (1.0 - saturate(waveCenter * .05));
+	float waveCenter = length(point.xz - vec2(650.0, 552));
+	normal.xz += (sin(fractal(point * .2) * 2.4 + waveCenter - Time * 10.0) * .4 - .4) * (1.0 - saturate(waveCenter * .05));
 
 	vec3 refl = reflect(rayDirection, normalize(normal));
 	refl.y = abs(refl.y) * .85;

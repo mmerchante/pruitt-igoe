@@ -5,6 +5,10 @@
 // Conservative depth testing
 //layout (depth_greater) out float gl_FragDepth;
 
+#ifdef CUSTOM_BACKGROUND
+vec3 sceneBackground();
+#endif
+
 #ifdef ENABLE_ALPHA
 // - If the shader needs alpha blending, it can return it through here
 float shadeAlpha(vec3 point);
@@ -168,7 +172,11 @@ vec3 reflections(vec3 origin, vec3 direction, float initialOffset)
 		return color;
 	}
 
+#ifdef CUSTOM_BACKGROUND
+	return sceneBackground();
+#else
 	return vec3(1.0);
+#endif
 }
 #endif
 

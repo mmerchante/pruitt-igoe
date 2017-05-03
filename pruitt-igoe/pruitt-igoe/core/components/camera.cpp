@@ -15,6 +15,7 @@ void Camera::Awake()
     this->viewProjectionMatrix = glm::mat4(1.f);
 	this->width = Engine::GetInstance()->GetScreenSize().x;
 	this->height = Engine::GetInstance()->GetScreenSize().y;
+	this->viewport = glm::vec4(0.0f);
     this->nearClip = 1.f;
     this->farClip = 1000.f;
     this->backgroundColor = glm::vec4(.2f, .2f, .2f, 1.f);
@@ -89,12 +90,12 @@ void Camera::Render()
 	if (renderTexture != nullptr)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, renderTexture->GetFramebufferID());
-		glViewport(0, 0, renderTexture->GetWidth(), renderTexture->GetHeight());
+		glViewport(viewport.x, viewport.y, renderTexture->GetWidth() - viewport.z, renderTexture->GetHeight() - viewport.w);
 	}
 	else
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, width, height);
+		glViewport(viewport.x, viewport.y, width - viewport.z, height - viewport.w);
 	}
 
 	int flags = 0;
