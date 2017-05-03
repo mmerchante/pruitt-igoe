@@ -5,6 +5,11 @@
 // Conservative depth testing
 layout (depth_greater) out float gl_FragDepth;
 
+#ifdef VOLUMETRIC
+// - rgb is the accumulated color, alpha is the actual density
+vec4 density(vec3 point);
+#endif
+
 #ifdef REFLECTIONS
 // - sceneReflections: the raymarched sdf for reflections, which can be different than the object's sdf
 float sceneReflections(vec3 point);
@@ -194,6 +199,32 @@ float shadows(vec3 origin, vec3 lightPosition)
 }
 #endif
 
+#ifdef VOLUMETRIC
+void main()
+{
+	vec3 rayOrigin = vertexData.localCameraPosition;
+	vec3 toCamera = vertexData.localVertexPosition - rayOrigin;
+	vec3 rayDir = normalize(toCamera);
+
+	vec4 color = vec4(0.0);
+	float t = length(toCamera);
+
+	for(int i = 0; i < MAX_ITERATIONS; i++ )
+	{
+		if(color.a > 0.99)
+			break;
+		
+		vec3 p = rayOrigin + t * rayDir;
+		vec4 col = density(p);
+		col.rgb *= col.a;
+
+		color += col * (1.0 - color.a);	
+		t += 0.05;
+	}
+
+	out_Col = color;
+}
+#else
 void main()
 {
 	vec3 rayOrigin = vertexData.localCameraPosition;
@@ -274,3 +305,4 @@ void main()
 
 	gl_FragDepth = (t - CameraParameters.x) / (CameraParameters.y - CameraParameters.x);
 }
+#endif

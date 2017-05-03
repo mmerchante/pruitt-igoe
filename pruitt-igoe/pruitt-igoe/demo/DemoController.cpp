@@ -87,7 +87,10 @@ void DemoController::Awake()
 
 	Material * pillarMaterial = new Material("raymarched/light_pillar");
 	pillarMaterial->SetTexture("RandomTexture", randomTexture);
+	pillarMaterial->SetFeature(GL_BLEND, true);
+	pillarMaterial->SetBlendOperation(Material::BlendOperation(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	pillarRenderer->SetMaterial(pillarMaterial);
+	
 
 	raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);

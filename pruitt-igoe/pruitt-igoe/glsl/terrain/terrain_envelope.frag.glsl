@@ -27,17 +27,7 @@ uniform float Time;
 float scene(vec3 point)
 {
 	vec2 uv = point.xz * TerrainScale.xz;
-	//vec3 n = texture2D(HeightfieldNormal, uv).rgb * 2.0 - vec3(1.0);
- 
-	//float angle = atan(n.y, n.x) ;
-	//float deriv = (1.0 - smoothstep(n.z - .1, n.z, .8)) * sin((angle + uv.x + uv.y) * .5) * .5 + .5;
-
 	float h = texture2D(Heightfield, uv).r;
-
-	//deriv *= 1.5;
-
-	//h = h - deriv;
-	
 	float d = (point.y - h);
 	return d;
 } 
@@ -47,12 +37,12 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	vec2 uv = point.xz * TerrainScale.xz;
 	float tex = texture2D(Heightfield, uv).r;
 
-	vec3 lightPosition = vec3(512.0, 0, 0.0);
+	vec3 lightPosition = vec3(512.0, 0, 512.0);
 
 	float steepness = saturate(pow(smoothstep(.5, 1.0, abs(normal.y)), 3.0));
 	float snow = saturate((point.y + steepness * 10.0 + 35.f)/10.f) * abs(normal.y * normal.y * normal.y);
 
-	vec3 lightDirection = normalize(vec3(1.8, .15, .6));// normalize(lightPosition - point);
+	vec3 lightDirection = normalize(lightPosition - point);
 	float cosTheta = dot(normal, lightDirection);
  
 	vec3 refl = reflect(normal, rayDirection);
@@ -76,7 +66,7 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 
 	vec3 desaturated = vec3(pow(dot(outColor, vec3(0.299, 0.587, 0.114)), 1.5));
 
-	return outColor;// + vec3(1.0, .25, 0.0) * smoothstep(abs(tex), abs(tex) + 2.0, 5.0) * 1.5;//mix(outColor, desaturated, .35);
+	return desaturated;// + vec3(1.0, .25, 0.0) * smoothstep(abs(tex), abs(tex) + 2.0, 5.0) * 1.5;//mix(outColor, desaturated, .35);
 
 	//return vec3(step(length(texture2D(HeightfieldNormal, point.xz * TerrainScale.xz).rgb), 1.15));
 }
