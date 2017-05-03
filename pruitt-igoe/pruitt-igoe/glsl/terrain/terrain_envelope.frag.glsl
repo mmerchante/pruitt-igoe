@@ -1,6 +1,6 @@
 #version 450
 
-#define MAX_ITERATIONS 200
+#define MAX_ITERATIONS 250
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .01
 #define NORMAL_ESTIMATION_EPSILON 1.0
@@ -53,21 +53,10 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	vec3 amb = vec3(.2, .5, .9);
 
 	vec3 terrainColor = mix(vec3(.1, .1, .3), vec3(1.0), snow);
-
-	//vec3 terrainColor = vec3(.9, .8, .08) * .5;
-	//terrainColor *= steepness * 2.0;
-	//terrainColor = mix(terrainColor, vec3(.8, .8, 1.0) * .3, snow);
-	//terrainColor *= .25 + pow(saturate((point.y + 75.0) / 1500.f), 3.0) * 3.0; 
-
 	vec3 shadow = mix(vec3(.1, .35, .9), vec3(1.0), shadows(point - normal * 1.0, lightPosition));
 
 	vec3 outColor = terrainColor * diffuse + amb * specular + amb * ambient;
 	outColor = mix(outColor, amb * 2.0, saturate(-.15 + t / 400.0)) * shadow;// + amb * saturate(-cosTheta) * .15;
 
-	vec3 desaturated = vec3(pow(dot(outColor, vec3(0.299, 0.587, 0.114)), 1.5));
-
-
-	return outColor * falloff;// + vec3(1.0, .25, 0.0) * smoothstep(abs(tex), abs(tex) + 2.0, 5.0) * 1.5;//mix(outColor, desaturated, .35);
-
-	//return vec3(step(length(texture2D(HeightfieldNormal, point.xz * TerrainScale.xz).rgb), 1.15));
+	return outColor * falloff;// + vec3(1.0, .25, 0.0) * smoothstep(abs(tex), abs(tex) + 2.0, 5.0) * 1.5;
 }

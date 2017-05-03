@@ -3,7 +3,12 @@
 // It has the main function, and assumes the existence of certain functions, such as 
 
 // Conservative depth testing
-layout (depth_greater) out float gl_FragDepth;
+//layout (depth_greater) out float gl_FragDepth;
+
+#ifdef ENABLE_ALPHA
+// - If the shader needs alpha blending, it can return it through here
+float shadeAlpha(vec3 point);
+#endif
 
 #ifdef VOLUMETRIC
 // - rgb is the accumulated color, alpha is the actual density
@@ -292,9 +297,16 @@ void main()
 
 		color = shade(current, normal, CameraPosition.xyz, normalize(current - CameraPosition.xyz), t);
 
-		// Gamma correction
+		// Gamma correction: TODO: Check if projector destroys gamma
 		color = pow(color, vec3(.45454));
+
+#ifdef ENABLE_ALPHA
+		float alpha = shadeAlpha(current);
+		out_Col = vec4(color, alpha);
+#else
 		out_Col = vec4(color, 1.0);
+#endif
+
 #endif
 	}
 	else
