@@ -1,6 +1,6 @@
 #version 450
 
-#define MAX_ITERATIONS 40
+#define MAX_ITERATIONS 20
 #define SECONDARY_ITERATIONS 5
 #define EPSILON .001
 #define NORMAL_ESTIMATION_EPSILON .1
@@ -40,13 +40,14 @@ float fractal(vec3 p)
 vec4 density(vec3 point)
 {
 	point.xz += sin(point.y * 20.0 + Time * 30.0) * .5 * saturate((100.0 - point.y) / 400.0) * .1;
-	float l = length(point.xz) * 2.0;
+	float l = length(point.xz) * 3.2;
 	vec3 q = point;
 	q.y *= 100.0;
 	q.xz *= .4;
 
-	float d = fractal(q * 1.0) * saturate(1.0 - l);
-	vec3 color =  vec3(.2, .3, .7) * (1.0 - l) * 7.0;
+	float d = fractal(q) * saturate(1.0 - l);
+	d *= step(-.1, point.y);
+	vec3 color = vec3(.2, .85, .3) * (1.0 - l) * 10.0;
 	return vec4(color, d * d);
 }
 

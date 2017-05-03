@@ -252,6 +252,7 @@ public:
 		context.secondTerrain->GetGameObject()->SetEnabled(true);
 		context.secondTerrain->GetTransform()->SetLocalRotation(glm::vec3());
 		context.secondTerrain->GetTransform()->SetLocalPosition(glm::vec3());
+		context.pillar->SetEnabled(true);
 		context.secondTerrain->material->SetFeature(GL_STENCIL_TEST, false);
 
 		// Reset rotation
@@ -349,20 +350,22 @@ void DemoController::Awake()
 	waterMaterial->SetBlendOperation(Material::BlendOperation(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	waterRenderer->SetMaterial(waterMaterial);
 
-/*
+
 	GameObject * lightPillar = GameObject::Instantiate("lightPillar");
 	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
 	pillarRenderer->SetMesh(MeshFactory::BuildCube(true, true));
 	pillarRenderer->GetTransform()->SetLocalScale(glm::vec3(10.f, 1000.f, 10.f));
-	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(512, 64, 512));
+	pillarRenderer->GetTransform()->SetLocalPosition(glm::vec3(645.617249, 64.196426, 673.341614));
 
 	Material * pillarMaterial = new Material("raymarched/light_pillar");
 	pillarMaterial->SetTexture("RandomTexture", randomTexture);
 	pillarMaterial->SetFeature(GL_BLEND, true);
 	pillarMaterial->SetBlendOperation(Material::BlendOperation(GL_ONE, GL_ONE));
-	pillarRenderer->SetMaterial(pillarMaterial);*/
+	pillarRenderer->SetMaterial(pillarMaterial);
+
+	lightPillar->SetEnabled(false);
 	
-	//raymarchedMaterials.push_back(pillarMaterial);
+	raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);
 	raymarchedMaterials.push_back(waterMaterial);
 	raymarchedMaterials.push_back(secondaryTerrain->material);
@@ -408,6 +411,8 @@ void DemoController::Awake()
 	context.secondTerrain = secondaryTerrain;
 	context.vignetteMaterial = vignetteMaterial;
 	context.camController = cameraController;
+	context.pillar = lightPillar;
+	context.pillarMaterial = pillarMaterial;
 
 	this->cameraController->AddCameraShot(new WaitCamera(2.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new IntroCamera(12.5f, this->cameraController->camera, context));
