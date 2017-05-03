@@ -1,12 +1,12 @@
 #version 450
 
-#define MAX_ITERATIONS 120
+#define MAX_ITERATIONS 130
 #define SECONDARY_ITERATIONS 3
 #define EPSILON 1.0
 #define NORMAL_ESTIMATION_EPSILON 1.2
 
 // SHADOW PARAMETERS
-#define SHADOW_ITERATIONS 130
+#define SHADOW_ITERATIONS 200
 #define SHADOW_SOFT_FACTOR 20.0
 #define SHADOW_EPSILON 3.85
 #define SHADOW_OFFSET 5.0
@@ -23,6 +23,7 @@ uniform sampler2D HeightfieldNormal;
 
 uniform vec4 TerrainScale; // Scaling in the sdf to prevent transformation errors
 uniform float Time;
+uniform float Underworld;
  
 float scene(vec3 point)
 {
@@ -37,7 +38,7 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	vec2 uv = point.xz * TerrainScale.xz;
 	float snow = saturate(smoothstep(.6, .65, normal.y) - step(-35.0, point.y));
 
-	vec3 lightPosition = vec3(512.0, 50, 512.0);
+	vec3 lightPosition = mix( vec3(100.0, -20, 132.0), vec3(600.0, 120, 632.0), Underworld);
 	vec3 lightDirection = normalize(lightPosition - point);
 
 	float cosTheta = dot(normal, lightDirection);
@@ -57,5 +58,5 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	float falloff = 5000.0 / pow(length(lightPosition - point) + .001, 2.0);
 
 	float s = length(outColor) * falloff;
-	return vec3(s * s * 4.0);
+	return vec3(.2, .85, .3) * (s * s * 5.0);
 }

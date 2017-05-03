@@ -1,11 +1,12 @@
 #include "DemoController.h"
 #include "Terrain.h"
+#include "UnderworldTerrain.h"
 #include <random>
 
 struct DemoContext
 {
 	Terrain * firstTerrain;
-	Terrain * secondTerrain;
+	UnderworldTerrain * secondTerrain;
 
 	GameObject * water;
 	Material * waterMaterial;
@@ -148,7 +149,7 @@ public:
 		glm::vec3 dir = glm::normalize(target - pos);
 		pos += dir * 200.f * time;
 
-		if (time > .525f)
+		if (time > .58f)
 		{
 			context.firstTerrain->GetGameObject()->SetEnabled(false);
 			context.portal->SetEnabled(false);
@@ -194,8 +195,11 @@ public:
 
 	virtual void OnUpdate(float time)
 	{
-		glm::vec3 pos = glm::vec3(700, -80, 780) + glm::vec3(-50.f, 10.f, -50.f) * time;
-		glm::vec3 target = glm::vec3(600, -75.f, 650) + glm::vec3(-10.f, 5.f, -200.f) * time;
+		glm::vec3 target = glm::vec3(-151.466568, -59.993839, 248.944382);
+		glm::vec3 pos = glm::vec3(-113.519089, -60.204563, 261.591309);
+
+		glm::vec3 dir = glm::normalize(target - pos);
+		pos += dir * 300.f * (time + .2f);
 
 		this->camera->GetTransform()->SetLocalPosition(pos);
 		this->camera->GetTransform()->LookAt(target);
@@ -214,14 +218,16 @@ public:
 		// Reset rotation
 		camera->GetTransform()->SetLocalRotation(glm::vec3());
 		this->camera->SetFieldOfView(25.f);
+
+		context.secondTerrain->material->SetFloat("Underworld", 1.f);
 	}
 };
 
 void DemoController::Awake()
 {
 	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
-	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
-	raymarchingTarget->Load();
+	/*RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	raymarchingTarget->Load();*/
 
 	Texture * randomTexture = BuildRandomTexture();
 
@@ -229,7 +235,7 @@ void DemoController::Awake()
 	this->cameraController = raymarchingCamera->AddComponent<DemoCameraController>();
 	this->cameraController->GetTransform()->SetWorldPosition(glm::vec3(1024, 64, 512));
 	this->cameraController->GetTransform()->LookAt(glm::vec3(0.0, 20.0, 0.0));
-	this->cameraController->camera->SetRenderTexture(raymarchingTarget);
+	//this->cameraController->camera->SetRenderTexture(raymarchingTarget);
 	this->cameraController->camera->backgroundColor = glm::vec4(0.f, 0.f, 0.f, 1.0);
 	this->cameraController->camera->SetFarClip(2000);
 	this->cameraController->camera->SetNearClip(10);
@@ -276,9 +282,9 @@ void DemoController::Awake()
 	this->terrain->material->SetStencilOperation(stencilTerrain);
 
 	GameObject * secondaryTerrainGO = GameObject::Instantiate("terrain");
-	Terrain * secondaryTerrain = secondaryTerrainGO->AddComponent<Terrain>();
+	UnderworldTerrain * secondaryTerrain = secondaryTerrainGO->AddComponent<UnderworldTerrain>();
 	secondaryTerrain->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(180.f), 0.f, 0.f));
-	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(0, -150.f, 1024.f));
+	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(-500.f, -140.f, 1024.f));
 
 	Material::StencilOperation stencilTerrainSecondary;
 	stencilTerrainSecondary.mask = 0x00;
@@ -288,6 +294,7 @@ void DemoController::Awake()
 	stencilTerrainSecondary.pass = GL_KEEP;
 	secondaryTerrain->material->SetFeature(GL_STENCIL_TEST, true);
 	secondaryTerrain->material->SetStencilOperation(stencilTerrainSecondary);
+	secondaryTerrain->material->SetFloat("Underworld", 0.f);
 
 	GameObject * waterGO = GameObject::Instantiate("water");
 	waterGO->GetTransform()->SetLocalPosition(glm::vec3(625, -90.f, 472));
@@ -320,9 +327,9 @@ void DemoController::Awake()
 	raymarchedMaterials.push_back(terrain->material);
 	raymarchedMaterials.push_back(waterMaterial);
 	raymarchedMaterials.push_back(secondaryTerrain->material);
-
+/*
 	ShaderPassComposer * composer = new ShaderPassComposer();
-	composer->SetSourceTarget(raymarchingTarget);
+	composer->SetSourceTarget(raymarchingTarget);*/
 
 	//// Iterative raymarcher
 	
@@ -352,16 +359,16 @@ void DemoController::Awake()
 	this->cameraController->AddCameraShot(new IntroCamera(12.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new TeleCamera(4.65f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new TeleCameraPrePortal(8.65f, this->cameraController->camera, context));
-	this->cameraController->AddCameraShot(new PortalCamera(17.f, this->cameraController->camera, context));
+	this->cameraController->AddCameraShot(new PortalCamera(17.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new UnderworldCamera(20.f, this->cameraController->camera, context));
 	
 
-	
-	// Shade
-	ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
-	composer->AddPass(shadingPass);
+	//
+	//// Shade
+	//ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
+	//composer->AddPass(shadingPass);
 
-	Engine::GetInstance()->AddShaderComposer(composer);
+	//Engine::GetInstance()->AddShaderComposer(composer);
 }
 
 void DemoController::Start()

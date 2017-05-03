@@ -151,6 +151,7 @@
     <ClCompile Include="demo\DemoController.cpp" />
     <ClCompile Include="demo\DemoCameraController.cpp" />
     <ClCompile Include="demo\generator\TerrainGenerator.cpp" />
+    <ClCompile Include="demo\UnderworldTerrain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="core\components\ShaderReloader.cpp" />
     <ClCompile Include="demo\Terrain.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="core\components\ShaderReloader.h" />
     <ClInclude Include="demo\generator\TerrainGenerator.h" />
     <ClInclude Include="demo\Terrain.h" />
+    <ClInclude Include="demo\UnderworldTerrain.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\font.png" />
@@ -211,6 +213,8 @@
     <None Include="glsl\shadingPass.vert.glsl" />
     <None Include="glsl\terrain.frag.glsl" />
     <None Include="glsl\terrain.vert.glsl" />
+    <None Include="glsl\terrain\underworld.frag.glsl" />
+    <None Include="glsl\terrain\underworld.vert.glsl" />
     <None Include="glsl\terrain\wireframe.frag.glsl" />
     <None Include="glsl\terrain\wireframe.vert.glsl" />
     <None Include="glsl\terrain\terrain_envelope.frag.glsl" />

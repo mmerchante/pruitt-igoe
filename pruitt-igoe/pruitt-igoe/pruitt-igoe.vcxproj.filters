@@ -93,6 +93,9 @@
     <ClCompile Include="demo\generator\TerrainGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="demo\UnderworldTerrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
@@ -176,6 +179,9 @@
     <ClInclude Include="demo\generator\TerrainGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="demo\UnderworldTerrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="test.png">
@@ -216,5 +222,7 @@
     <None Include="glsl\library\Raymarching.glsl" />
     <None Include="glsl\raymarched\water.frag.glsl" />
     <None Include="glsl\raymarched\water.vert.glsl" />
+    <None Include="glsl\terrain\underworld.frag.glsl" />
+    <None Include="glsl\terrain\underworld.vert.glsl" />
   </ItemGroup>
 </Project>

@@ -22,7 +22,7 @@ uniform float WaveTime;
 
 vec3 sceneBackground()
 {
-	return vec3(.1, .35, .9) * .075;
+	return vec3(.1);
 }
 
 float noise( in vec3 x )
@@ -72,27 +72,25 @@ vec3 shadeReflections(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection
 	float snow = saturate(smoothstep(.6, .65, normal.y) - step(-35.0, point.y));
 
 	vec3 lightPosition = vec3(512.0, 50, 512.0);
-	float falloff = 5000.0 / pow(length(lightPosition - point) + .001, 2.0);
-
 	vec3 lightDirection = normalize(lightPosition - point);
+
 	float cosTheta = dot(normal, lightDirection);
  
-	vec3 refl = reflect(normal, rayDirection);
 	float rim = pow(1.0 - dot(rayDirection, -normal), 3.0);
-
-	float diffuse = pow(smoothstep(0.0, 1.0, cosTheta * .5 + .5), 3.0) * .25 + .25 + rim * .5;
-	float ambient = .04f + rim * .0075 - saturate(-cosTheta) * .13;
-	float specular = pow(saturate(dot(refl, lightDirection)), 1.5) * (1.0 - snow) * .15 * diffuse;
+	float diffuse = pow(smoothstep(0.0, 1.0, cosTheta * .5 + .5), 3.0) * .25 + .25 + rim * .25;
+	float ambient = .04f + rim * .0075 - saturate(-cosTheta) * .05;
 
 	vec3 amb = vec3(.2, .5, .9);
 
-	vec3 terrainColor = mix(vec3(.1, .1, .3), vec3(1.0), snow);
-	vec3 shadow = vec3(1.0);// mix(vec3(.1, .35, .9), vec3(1.0), shadows(point - normal * 1.0, lightPosition));
+	vec3 terrainColor = mix(vec3(.1, .1, .3), vec3(.95, .5, .1) * 1.2, snow);
 
-	vec3 outColor = terrainColor * diffuse + amb * specular + amb * ambient;
-	outColor = mix(outColor, amb * 2.0, saturate(-.15 + t / 400.0)) * shadow;// + amb * saturate(-cosTheta) * .15;
+	vec3 outColor = terrainColor * diffuse + amb * ambient;
+	outColor = mix(outColor, amb * 1.5, saturate(-.15 + t / 400.0));
 
-	return outColor * falloff;// + vec3(1.0, .25, 0.0) * smoothstep(abs(tex), abs(tex) + 2.0, 5.0) * 1.5;
+	float falloff = 5000.0 / pow(length(lightPosition - point) + .001, 2.0);
+
+	float s = length(outColor) * falloff * falloff;
+	return vec3(s * s * 8.0);
 }
 
 float scene(vec3 point)

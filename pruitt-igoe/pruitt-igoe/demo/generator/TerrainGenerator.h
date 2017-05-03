@@ -10,7 +10,7 @@ public:
 class FractalGenerator : public BaseGenerator
 {
 public:
-	FractalGenerator(int octaves, float frequency, float frequencyMultiplier, float amplitudeMultiplier, float amplitude);
+	FractalGenerator(int octaves, float frequency, float frequencyMultiplier, float amplitudeMultiplier, float amplitude, float weirdness = 0.f, glm::vec2 offset = glm::vec2());
 	virtual void Generate(float * terrain, int width, int height);
 private:
 
@@ -24,6 +24,8 @@ private:
 	float amplitudeMultiplier;
 	float amplitude;
 	int gradientMapSize;
+	float weirdness;
+	glm::vec2 offset;
 };
 
 class Filter

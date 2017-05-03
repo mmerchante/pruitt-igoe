@@ -1,22 +1,20 @@
-#include "Terrain.h"
+#include "UnderworldTerrain.h"
 #include "generator\TerrainGenerator.h"
 
-#define SHOW_WIREFRAME false
-
-void Terrain::Awake()
+void UnderworldTerrain::Awake()
 {
-	int heightmapSize = 1024;
+	int heightmapSize = 2048;
 	int approxHeightmapSize = heightmapSize;
 
-	float maxHeight = 210.f;
+	float maxHeight = 300.f;
 
 	TerrainGenerator generator;
-	FractalGenerator * advGen = new FractalGenerator(9, 1.5f, 2.0f, .575f, maxHeight);
+	FractalGenerator * advGen = new FractalGenerator(10, 1.5f, 2.5f, .625f, maxHeight, .5f, glm::vec2(.234f, .8475f));
 	generator.SetBaseGenerator(advGen);
 
 	float * rawTerrain = generator.Generate(heightmapSize, heightmapSize);
 
-	int resolutionDownsampling = 16;
+	int resolutionDownsampling = 4;
 	int width = heightmapSize / resolutionDownsampling;
 	int height = heightmapSize / resolutionDownsampling;
 
@@ -37,40 +35,25 @@ void Terrain::Awake()
 
 	float verticalScale = 1.f;
 	float scale = .75f;// *.25f;
-	
+
 	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolutionDownsampling);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
 	this->renderer->SetMesh(terrainMesh);
-	this->material = new Material("terrain/terrain_envelope");
+	this->material = new Material("terrain/underworld");
 	this->renderer->SetMaterial(material);
 
 	// Match the raymarched terrain with the mesh
 	this->GetTransform()->SetLocalScale(glm::vec3(scale, 1.f, scale));
 	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmapSize, verticalScale, 1.f / heightmapSize, 0.f));
-	
+
 	Texture * fpTexture = new Texture();
 	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
 	this->floatingPointHeightmap = fpTexture;
 	this->material->SetTexture("Heightfield", fpTexture);
-
-	if (SHOW_WIREFRAME)
-	{
-		GameObject * wireframeGO = GameObject::Instantiate("wireframeTerrain");
-		MeshRenderer * wireframeRenderer = wireframeGO->AddComponent<MeshRenderer>();
-		wireframeRenderer->SetMesh(terrainMesh);
-		wireframeGO->GetTransform()->SetLocalScale(glm::vec3(scale, 1.f, scale));
-
-		Material * wireframeMat = new Material("terrain/wireframe");
-		wireframeMat->SetColor("Color", glm::vec4(.1, .1, .1, 1.0f));
-		wireframeMat->SetOverrideDrawingMode(GL_LINES);
-		wireframeMat->SetFeature(GL_DEPTH_TEST, false);
-		wireframeRenderer->SetMaterial(wireframeMat);
-	}
-
+	
 	delete[] hpHeightmap;
 }
-
 
 inline
 float Sample(float * heightmap, int x, int y, int width, int height)
@@ -78,7 +61,7 @@ float Sample(float * heightmap, int x, int y, int width, int height)
 	return heightmap[glm::clamp(y, 0, height - 1) * width + glm::clamp(x, 0, width - 1)];
 }
 
-glm::vec3 * Terrain::GetNormalMap(float * heightmap, int width, int height)
+glm::vec3 * UnderworldTerrain::GetNormalMap(float * heightmap, int width, int height)
 {
 	glm::vec3 * output = new glm::vec3[width * height];
 
@@ -88,20 +71,20 @@ glm::vec3 * Terrain::GetNormalMap(float * heightmap, int width, int height)
 		{
 			float horizontal = 0.f;
 			horizontal += Sample(heightmap, x - 1, y + 1, width, height);
-			horizontal += Sample(heightmap, x - 1, y    , width, height) * 2.f;
+			horizontal += Sample(heightmap, x - 1, y, width, height) * 2.f;
 			horizontal += Sample(heightmap, x - 1, y - 1, width, height);
 
 			horizontal -= Sample(heightmap, x + 1, y + 1, width, height);
-			horizontal -= Sample(heightmap, x + 1, y    , width, height) * 2.f;
+			horizontal -= Sample(heightmap, x + 1, y, width, height) * 2.f;
 			horizontal -= Sample(heightmap, x + 1, y - 1, width, height);
 
 			float vertical = 0.f;
 			vertical += Sample(heightmap, x - 1, y - 1, width, height);
-			vertical += Sample(heightmap, x    , y - 1, width, height) * 2;
+			vertical += Sample(heightmap, x, y - 1, width, height) * 2;
 			vertical += Sample(heightmap, x + 1, y - 1, width, height);
 
 			vertical -= Sample(heightmap, x - 1, y + 1, width, height);
-			vertical -= Sample(heightmap, x	   , y + 1, width, height) * 2;
+			vertical -= Sample(heightmap, x, y + 1, width, height) * 2;
 			vertical -= Sample(heightmap, x + 1, y + 1, width, height);
 
 			int index = y * width + x;
@@ -113,13 +96,13 @@ glm::vec3 * Terrain::GetNormalMap(float * heightmap, int width, int height)
 			output[index + 3] = 0;*/
 		}
 	}
-/*
+	/*
 	Texture * normalMap = new Texture();
 	normalMap->LoadFromRaw(output, width, height, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));*/
 	return output;
 }
 
-Mesh * Terrain::GenerateMesh(float * heightmap, int width, int height, float scale, float resolution)
+Mesh * UnderworldTerrain::GenerateMesh(float * heightmap, int width, int height, float scale, float resolution)
 {
 	std::vector<GLuint> indices;
 	std::vector<glm::vec4> vertices;
@@ -161,7 +144,7 @@ Mesh * Terrain::GenerateMesh(float * heightmap, int width, int height, float sca
 	}
 
 	Engine::LogInfo("Terrain mesh vertex count: " + std::to_string(vertices.size()));
-	
+
 	Mesh * output = new Mesh();
 	output->SetIndices(indices.data(), indices.size(), true);
 	output->SetVertices(vertices.data(), vertices.size(), true);

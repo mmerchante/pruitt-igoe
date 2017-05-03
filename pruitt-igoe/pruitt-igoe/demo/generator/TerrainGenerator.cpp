@@ -38,8 +38,8 @@ void TerrainGenerator::SetBaseGenerator(BaseGenerator * gen)
 	this->generator = gen;
 }
 
-FractalGenerator::FractalGenerator(int octaves, float frequency, float frequencyMultiplier, float amplitudeMultiplier, float amplitude)
-	: BaseGenerator(), octaves(octaves), frequency(frequency), frequencyMultiplier(frequencyMultiplier), amplitudeMultiplier(amplitudeMultiplier), amplitude(amplitude)
+FractalGenerator::FractalGenerator(int octaves, float frequency, float frequencyMultiplier, float amplitudeMultiplier, float amplitude, float weirdness, glm::vec2 offset)
+	: BaseGenerator(), octaves(octaves), frequency(frequency), frequencyMultiplier(frequencyMultiplier), amplitudeMultiplier(amplitudeMultiplier), amplitude(amplitude), weirdness(weirdness), offset(offset)
 {
 }
 
@@ -77,7 +77,8 @@ float grad(int hash, float x, float y)
 
 float FractalGenerator::perlin2D(float x, float y)
 {
-	x += .4f;
+	x += .4f + offset.x;
+	y += offset.y;
 
 	// Perlin's original approach
 	int X = x;
@@ -158,7 +159,7 @@ float FractalGenerator::advFractal(float x, float y)
 							  perlin2D(p.x * freq, (p.y + eps) * freq) - perlin2D(p.x * freq, (p.y - eps) * freq));
 
 		gradientData[i] = glm::length2(estimatedNormal);
-		dsum += estimatedNormal;
+		dsum += estimatedNormal * (1.0 + weirdness);
 
 		float frequencyModulator = glm::smoothstep(0.f, 1.f, glm::clamp(glm::dot(estimatedNormal, estimatedNormal), 0.f, 1.f));
 
@@ -175,8 +176,8 @@ float FractalGenerator::advFractal(float x, float y)
 		result += r;
 		accum += ampl;
 
-		freq *= glm::mix(frequencyMultiplier * .99f, frequencyMultiplier, frequencyModulator);
-		ampl *= glm::mix(amplitudeMultiplier * .935f, amplitudeMultiplier, frequencyModulator);
+		freq *= glm::mix(frequencyMultiplier * glm::mix(.99f, .94f, weirdness), frequencyMultiplier, frequencyModulator);
+		ampl *= glm::mix(amplitudeMultiplier * glm::mix(.935f, .87f, weirdness), amplitudeMultiplier, frequencyModulator);
 	}
 
 	// Some erosion inspired ridges
