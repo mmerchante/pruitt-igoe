@@ -226,5 +226,7 @@
     <None Include="glsl\terrain\underworld.vert.glsl" />
     <None Include="glsl\vignette.frag.glsl" />
     <None Include="glsl\vignette.vert.glsl" />
+    <None Include="glsl\glitch.frag.glsl" />
+    <None Include="glsl\glitch.vert.glsl" />
   </ItemGroup>
 </Project>

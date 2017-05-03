@@ -82,7 +82,7 @@ public:
 
 	virtual void OnUpdate(float time)
 	{
-		glm::vec3 pos = glm::vec3(705.0, 25, 552) + glm::vec3(0.f, -20.f, -100.f) * time;
+		glm::vec3 pos = glm::vec3(705.0, 25, 552) + glm::vec3(0.f, 60.f, -100.f) * time;
 		glm::vec3 target = glm::vec3(650.0, -100.f, 552) + glm::vec3(0.f, 5.f, -80.f) * glm::smoothstep(0.f, 1.f, time);
 
 		this->camera->GetTransform()->SetLocalPosition(pos);
@@ -186,6 +186,8 @@ public:
 		glm::vec3 dir = glm::normalize(target - pos);
 		pos += dir * 200.f * time;
 
+		context.secondTerrain->material->SetFloat("Fade", glm::clamp(time * 3.f - .1f, 0.f, 1.f));
+
 		if (time > .58f)
 		{
 			context.firstTerrain->GetGameObject()->SetEnabled(false);
@@ -266,8 +268,8 @@ public:
 void DemoController::Awake()
 {
 	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
-	/*RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
-	raymarchingTarget->Load();*/
+	//RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	//raymarchingTarget->Load();
 
 	Texture * randomTexture = BuildRandomTexture();
 
@@ -335,6 +337,7 @@ void DemoController::Awake()
 	secondaryTerrain->material->SetFeature(GL_STENCIL_TEST, true);
 	secondaryTerrain->material->SetStencilOperation(stencilTerrainSecondary);
 	secondaryTerrain->material->SetFloat("Underworld", 0.f);
+	secondaryTerrain->material->SetFloat("Fade", 0.f);
 
 	GameObject * waterGO = GameObject::Instantiate("water");
 	waterGO->GetTransform()->SetLocalPosition(glm::vec3(625, -90.f, 472));
@@ -414,24 +417,22 @@ void DemoController::Awake()
 	context.pillar = lightPillar;
 	context.pillarMaterial = pillarMaterial;
 
-	this->cameraController->AddCameraShot(new WaitCamera(2.5f, this->cameraController->camera, context));
+	this->cameraController->AddCameraShot(new WaitCamera(3.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new IntroCamera(12.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new TeleCamera(4.65f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new TeleCameraPrePortal(8.65f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new PortalCamera(17.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new UnderworldCamera(20.f, this->cameraController->camera, context));
 	
-
-	//
-	//// Shade
-	//ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
+	//// Glitch pass
+	//ShaderPass * shadingPass = new ShaderPass("glitch");
 	//composer->AddPass(shadingPass);
-
 	//Engine::GetInstance()->AddShaderComposer(composer);
 }
 
 void DemoController::Start()
 {
+
 }
 
 void DemoController::Update()

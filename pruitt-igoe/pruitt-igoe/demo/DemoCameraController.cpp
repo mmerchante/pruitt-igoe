@@ -19,6 +19,7 @@ void DemoCameraController::Awake()
 void DemoCameraController::Start()
 {
 	music.openFromFile("resources/music.ogg");
+	manualMode = false;
 }
 
 void DemoCameraController::PhysicsUpdate()

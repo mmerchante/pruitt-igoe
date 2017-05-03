@@ -24,6 +24,7 @@ uniform sampler2D HeightfieldNormal;
 uniform vec4 TerrainScale; // Scaling in the sdf to prevent transformation errors
 uniform float Time;
 uniform float Underworld;
+uniform float Fade;
  
 float scene(vec3 point)
 {
@@ -58,5 +59,5 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	float falloff = 5000.0 / pow(length(lightPosition - point) + .001, 2.0);
 
 	float s = length(outColor) * falloff;
-	return vec3(.2, .85, .3) * (s * s * 5.0);
+	return vec3(.2, .85, .3) * (s * s * 5.0) * Fade;
 }
