@@ -8,6 +8,8 @@
 #include <glm/gtx/common.hpp>
 #include <glm/ext.hpp>
 
+#define SFML_STATIC
+
 #include <SFML\OpenGL.hpp>
 #include <SFML\Graphics.hpp>
 #include <SFML\Audio.hpp>

@@ -5,7 +5,7 @@
 
 void Terrain::Awake()
 {
-	int heightmapSize = 2048;
+	int heightmapSize = 4096;
 	int approxHeightmapSize = heightmapSize;
 
 	float maxHeight = 210.f;
@@ -36,7 +36,7 @@ void Terrain::Awake()
 	}
 
 	float verticalScale = 1.f;
-	float scale = .75f * .5f;// *.25f;
+	float scale = .75f * .25f;
 	
 	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolutionDownsampling);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();

@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+#include "common.h"
 
 #include "core\assets\assetdatabase.h"
 #include "core\assets\texture.h"
