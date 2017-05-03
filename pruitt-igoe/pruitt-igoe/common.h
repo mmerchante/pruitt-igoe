@@ -10,5 +10,6 @@
 
 #include <SFML\OpenGL.hpp>
 #include <SFML\Graphics.hpp>
+#include <SFML\Audio.hpp>
 
 #include <iostream>

@@ -103,7 +103,7 @@ float FractalGenerator::perlin2D(float x, float y)
 				   glm::mix(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u),
 				   v) / .707f;
 
-	return abs(output);
+	return 1.0 - abs(output);
 }
 
 float FractalGenerator::fbm(float x, float y)
@@ -158,38 +158,29 @@ float FractalGenerator::advFractal(float x, float y)
 							  perlin2D(p.x * freq, (p.y + eps) * freq) - perlin2D(p.x * freq, (p.y - eps) * freq));
 
 		gradientData[i] = glm::length2(estimatedNormal);
+		dsum += estimatedNormal;
 
-		if (glm::length2(estimatedNormal) == 0.0f)
-			estimatedNormal = glm::vec2(1.f);
-
-		if (i > 3)
-		{
-			dsum += estimatedNormal;
-		}
+		float frequencyModulator = glm::smoothstep(0.f, 1.f, glm::clamp(glm::dot(estimatedNormal, estimatedNormal), 0.f, 1.f));
 
 		float r = perlin2D(p.x * freq, p.y * freq);
-		r = glm::pow(r, 1.75f);
-		r *= ampl / (1.0f + glm::dot(dsum, dsum));
+
+		// Billow or ridged based on frequency
+		r = glm::clamp(glm::mix(1.0f - r, r, frequencyModulator), 0.f, 1.f);
+
+		r *= 1.f / (1.0f + glm::dot(dsum, dsum));
+		r = glm::mix(r, r * r, .7f);
+		r *= ampl;
 
 		octaveData[i] = r;
 		result += r;
 		accum += ampl;
 
-		if (i <= 3)
-		{
-			freq *= this->frequencyMultiplier;
-			ampl *= this->amplitudeMultiplier;
-		}
-		else
-		{
-			float frequencyModulator = glm::smoothstep(0.f, 1.f, glm::clamp(glm::dot(estimatedNormal, estimatedNormal), 0.f, 1.f));
-			freq *= glm::mix(frequencyMultiplier * .9f, frequencyMultiplier, frequencyModulator);
-			ampl *= glm::mix(amplitudeMultiplier * .9f, amplitudeMultiplier, frequencyModulator);
-		}
+		freq *= glm::mix(frequencyMultiplier * .99f, frequencyMultiplier, frequencyModulator);
+		ampl *= glm::mix(amplitudeMultiplier * .935f, amplitudeMultiplier, frequencyModulator);
 	}
 
 	// Some erosion inspired ridges
-	float ridges = glm::sin(gradientData[2] * 14.f) * .05f + 1.f;
+	float ridges = glm::sin(gradientData[2] * 14.f + octaveData[7] * .2) * .025f + 1.f;
 	result *= ridges;
 
 	if (accum == 0.f)
@@ -201,8 +192,8 @@ float FractalGenerator::advFractal(float x, float y)
 
 	int terraceCount = 4;
 	float terrace = (int)(result * terraceCount) /((float)terraceCount) + 
-		glm::smoothstep(0.f, 1.f, glm::fmod(result * ((float)terraceCount), ((float)terraceCount)) / ((float)terraceCount)) * .85f;
-	result = glm::mix(result, terrace, .15f);
+		glm::smoothstep(0.f, 1.f, glm::fmod(result * ((float)terraceCount), ((float)terraceCount)) / ((float)terraceCount));
+	result = glm::mix(result, terrace, .1f);
 	
 	return result * amplitude - amplitude * .5f;
 }

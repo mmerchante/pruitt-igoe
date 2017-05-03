@@ -8,10 +8,10 @@ void Terrain::Awake()
 	int heightmapSize = 2048;
 	int approxHeightmapSize = heightmapSize;
 
-	float maxHeight = 275.f;
+	float maxHeight = 210.f;
 
 	TerrainGenerator generator;
-	FractalGenerator * advGen = new FractalGenerator(9, 1.5f, 2.2f, .490f, maxHeight);
+	FractalGenerator * advGen = new FractalGenerator(9, 1.5f, 2.0f, .575f, maxHeight);
 	generator.SetBaseGenerator(advGen);
 
 	float * rawTerrain = generator.Generate(heightmapSize, heightmapSize);

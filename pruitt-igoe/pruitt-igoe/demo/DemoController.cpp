@@ -6,7 +6,6 @@ void DemoController::Awake()
 {
 	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
 	RenderTexture * raymarchingTarget = new RenderTexture(screenSize.x, screenSize.y, true, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
-	//raymarchingTarget->AddDrawBuffer(GL_DEPTH_ATTACHMENT);
 	raymarchingTarget->Load();
 
 	Texture * randomTexture = BuildRandomTexture();
@@ -22,8 +21,8 @@ void DemoController::Awake()
 	this->cameraController->camera->clearStencil = true;
 
 	GameObject * portalGO = GameObject::Instantiate("portal");
-	portalGO->GetTransform()->SetLocalScale(glm::vec3(50.f, 150.f, 20.f));
-	portalGO->GetTransform()->SetLocalPosition(glm::vec3(256.f, 0.f, 256.f));
+	portalGO->GetTransform()->SetLocalScale(glm::vec3(10.f, 50.f, 30.f));
+	portalGO->GetTransform()->SetLocalPosition(glm::vec3(712.f, -90.f, 512.f));
 	MeshRenderer * portalRenderer = portalGO->AddComponent<MeshRenderer>();
 	portalRenderer->SetMesh(MeshFactory::BuildCube(true));
 	Material * portalMaterial = new Material("flat");
@@ -50,11 +49,11 @@ void DemoController::Awake()
 	stencilTerrain.pass = GL_KEEP;
 	this->terrain->material->SetFeature(GL_STENCIL_TEST, true);
 	this->terrain->material->SetStencilOperation(stencilTerrain);
-
+/*
 	GameObject * secondaryTerrainGO = GameObject::Instantiate("terrain");
 	Terrain * secondaryTerrain = secondaryTerrainGO->AddComponent<Terrain>();
 	secondaryTerrain->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(180.f), 0.f, 0.f));
-	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(0, 100.f, 1024.f));
+	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(0, -100.f, 1024.f));
 
 	Material::StencilOperation stencilTerrainSecondary;
 	stencilTerrainSecondary.mask = 0x00;
@@ -64,8 +63,8 @@ void DemoController::Awake()
 	stencilTerrainSecondary.pass = GL_KEEP;
 	secondaryTerrain->material->SetFeature(GL_STENCIL_TEST, true);
 	secondaryTerrain->material->SetStencilOperation(stencilTerrainSecondary);
-
-
+*/
+/*
 	GameObject * waterGO = GameObject::Instantiate("water");
 	waterGO->GetTransform()->SetLocalPosition(glm::vec3(0.f, -105.f, 0.f));
 	waterGO->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(-90.f), 0.f, 0.f));
@@ -77,8 +76,8 @@ void DemoController::Awake()
 	waterMaterial->SetVector("TerrainScale", glm::vec4(1.f / 1024.f, 1.f, 1.f / 1024.f, 0.f));
 	waterMaterial->SetTexture("RandomTexture", randomTexture);
 	waterRenderer->SetMaterial(waterMaterial);
-
-
+*/
+/*
 	GameObject * lightPillar = GameObject::Instantiate("lightPillar");
 	MeshRenderer * pillarRenderer = lightPillar->AddComponent<MeshRenderer>();
 	pillarRenderer->SetMesh(MeshFactory::BuildCube(true, true));
@@ -88,14 +87,13 @@ void DemoController::Awake()
 	Material * pillarMaterial = new Material("raymarched/light_pillar");
 	pillarMaterial->SetTexture("RandomTexture", randomTexture);
 	pillarMaterial->SetFeature(GL_BLEND, true);
-	pillarMaterial->SetBlendOperation(Material::BlendOperation(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-	pillarRenderer->SetMaterial(pillarMaterial);
+	pillarMaterial->SetBlendOperation(Material::BlendOperation(GL_ONE, GL_ONE));
+	pillarRenderer->SetMaterial(pillarMaterial);*/
 	
-
-	raymarchedMaterials.push_back(pillarMaterial);
+	//raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);
-	raymarchedMaterials.push_back(waterMaterial);
-	raymarchedMaterials.push_back(secondaryTerrain->material);
+	//raymarchedMaterials.push_back(waterMaterial);
+	//raymarchedMaterials.push_back(secondaryTerrain->material);
 
 	ShaderPassComposer * composer = new ShaderPassComposer();
 	composer->SetSourceTarget(raymarchingTarget);
@@ -121,6 +119,12 @@ void DemoController::Awake()
 	composer->AddPass(shadingPass);
 
 	Engine::GetInstance()->AddShaderComposer(composer);
+}
+
+void DemoController::Start()
+{
+	//if (music.openFromFile("resources/music.ogg"))
+	//	music.play();
 }
 
 void DemoController::Update()

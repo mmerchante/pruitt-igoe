@@ -8,6 +8,7 @@ class DemoController : public Component, public InputListener
 {
 public:
 	void Awake();
+	void Start();
 	void Update();
 
 private:
@@ -20,5 +21,6 @@ private:
 	std::vector<Material*> raymarchedMaterials;
 
 	Texture * BuildRandomTexture();
+	sf::Music music;
 };
 
