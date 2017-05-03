@@ -2,6 +2,221 @@
 #include "Terrain.h"
 #include <random>
 
+struct DemoContext
+{
+	Terrain * firstTerrain;
+	Terrain * secondTerrain;
+
+	GameObject * water;
+	Material * waterMaterial;
+
+	GameObject * pillar;
+	Material * pillarMaterial;
+
+	GameObject * portal;
+	Material * portalMaterial;
+};
+
+class BaseDemoCamera : public CameraShotController
+{
+public:
+	BaseDemoCamera(float duration, PerspectiveCamera * camera, DemoContext context) : CameraShotController(duration, camera)
+	{
+		this->context = context;
+	}
+protected:
+	DemoContext context;
+};
+
+class IntroCamera : public BaseDemoCamera
+{
+public:
+	IntroCamera(float duration, PerspectiveCamera * camera, DemoContext context) : BaseDemoCamera(duration, camera, context)
+	{
+	}
+
+	virtual void OnExit()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(true);
+		context.water->SetEnabled(true);
+	}
+
+	virtual void OnUpdate(float time)
+	{
+		// TODO: Fade in overlay
+		glm::vec3 pos = glm::vec3(705.0, 25, 552) + glm::vec3(0.f, -20.f, -100.f) * time;
+		glm::vec3 target = glm::vec3(650.0, -100.f, 552) + glm::vec3(0.f, 5.f, -80.f) * glm::smoothstep(0.f, 1.f, time);
+
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		this->camera->GetTransform()->LookAt(target);
+
+		context.waterMaterial->SetFloat("WaveTime", time * this->duration);
+	}
+
+	virtual void OnSetActive()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(true);
+		context.firstTerrain->material->SetFeature(GL_STENCIL_TEST, false); // No stencil on this shot
+		context.water->SetEnabled(true);
+		context.portal->SetEnabled(false);
+
+		camera->GetTransform()->SetLocalRotation(glm::vec3());
+	}
+};
+
+class TeleCamera : public BaseDemoCamera
+{
+public:
+	TeleCamera(float duration, PerspectiveCamera * camera, DemoContext context) : BaseDemoCamera(duration, camera, context)
+	{
+	}
+
+	virtual void OnExit()
+	{
+	}
+
+	virtual void OnUpdate(float time)
+	{
+		glm::vec3 pos = glm::vec3(705.0, -59, 552) + glm::vec3(0.f, -20.f, -25.f) * time * .35f;
+		glm::vec3 target = glm::vec3(650.0, -75.f, 502) + glm::vec3(0.f, 5.f, -100.f) * time * .35f;
+
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		this->camera->GetTransform()->LookAt(target);
+	}
+
+	virtual void OnSetActive()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(true);
+		context.firstTerrain->material->SetFeature(GL_STENCIL_TEST, false); // No stencil on this shot
+		context.water->SetEnabled(false);
+		context.portal->SetEnabled(false);
+
+		// Reset rotation
+		camera->GetTransform()->SetLocalRotation(glm::vec3());
+	}
+};
+
+class TeleCameraPrePortal : public BaseDemoCamera
+{
+public:
+	TeleCameraPrePortal(float duration, PerspectiveCamera * camera, DemoContext context) : BaseDemoCamera(duration, camera, context)
+	{
+	}
+
+	virtual void OnExit()
+	{
+	}
+
+	virtual void OnUpdate(float time)
+	{
+		glm::vec3 pos = glm::vec3(700, -80, 780) + glm::vec3(-50.f, 10.f, -50.f) * time;
+		glm::vec3 target = glm::vec3(600, -75.f, 650) + glm::vec3(-10.f, 5.f, -200.f) * time;
+
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		this->camera->GetTransform()->LookAt(target);
+	}
+
+	virtual void OnSetActive()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(true);
+		context.firstTerrain->material->SetFeature(GL_STENCIL_TEST, false); // No stencil on this shot
+		context.water->SetEnabled(false);
+		context.portal->SetEnabled(false);
+
+		// Reset rotation
+		camera->GetTransform()->SetLocalRotation(glm::vec3());
+	}
+};
+
+
+class PortalCamera : public BaseDemoCamera
+{
+public:
+	PortalCamera(float duration, PerspectiveCamera * camera, DemoContext context) : BaseDemoCamera(duration, camera, context)
+	{
+	}
+
+	virtual void OnExit()
+	{
+	}
+
+	virtual void OnUpdate(float time)
+	{
+		glm::vec3 target = glm::vec3(588.694092, -63.046982, 746.651306);
+		glm::vec3 pos = glm::vec3(613.818787, -61.468536, 777.569641);
+
+		glm::vec3 dir = glm::normalize(target - pos);
+		pos += dir * 200.f * time;
+
+		if (time > .525f)
+		{
+			context.firstTerrain->GetGameObject()->SetEnabled(false);
+			context.portal->SetEnabled(false);
+			context.secondTerrain->material->SetFeature(GL_STENCIL_TEST, false);
+		}
+
+		this->camera->SetFieldOfView(30.f - time * 5.f);
+
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		
+		glm::quat rot = glm::angleAxis(Engine::DeltaTime() * .2f, dir);
+		this->camera->GetTransform()->RotateLocal(rot);
+	}
+
+	virtual void OnSetActive()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(true);
+		context.firstTerrain->material->SetFeature(GL_STENCIL_TEST, true);
+		context.portal->SetEnabled(true);
+
+		// Reset rotation
+		camera->GetTransform()->SetLocalRotation(glm::vec3());
+
+		glm::vec3 target = glm::vec3(588.694092, -63.046982, 746.651306);
+		glm::vec3 pos = glm::vec3(613.818787, -61.468536, 777.569641);
+		
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		this->camera->GetTransform()->LookAt(target);
+		this->camera->SetFieldOfView(30.f);
+	}
+};
+
+class UnderworldCamera : public BaseDemoCamera
+{
+public:
+	UnderworldCamera(float duration, PerspectiveCamera * camera, DemoContext context) : BaseDemoCamera(duration, camera, context)
+	{
+	}
+
+	virtual void OnExit()
+	{
+	}
+
+	virtual void OnUpdate(float time)
+	{
+		glm::vec3 pos = glm::vec3(700, -80, 780) + glm::vec3(-50.f, 10.f, -50.f) * time;
+		glm::vec3 target = glm::vec3(600, -75.f, 650) + glm::vec3(-10.f, 5.f, -200.f) * time;
+
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		this->camera->GetTransform()->LookAt(target);
+	}
+
+	virtual void OnSetActive()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(false);
+		context.water->SetEnabled(false);
+		context.portal->SetEnabled(false);
+		context.secondTerrain->GetGameObject()->SetEnabled(true);
+		context.secondTerrain->GetTransform()->SetLocalRotation(glm::vec3());
+		context.secondTerrain->GetTransform()->SetLocalPosition(glm::vec3());
+		context.secondTerrain->material->SetFeature(GL_STENCIL_TEST, false);
+
+		// Reset rotation
+		camera->GetTransform()->SetLocalRotation(glm::vec3());
+		this->camera->SetFieldOfView(25.f);
+	}
+};
+
 void DemoController::Awake()
 {
 	glm::vec2 screenSize = glm::vec2(Engine::GetScreenSize());
@@ -22,9 +237,17 @@ void DemoController::Awake()
 	this->cameraController->camera->SetFieldOfView(25.f);
 	this->cameraController->camera->viewport = glm::vec4(0.f, 120.f, 0.f, 240.f);
 
+
+	glm::vec3 pTarget = glm::vec3(588.694092, -65.046982, 746.651306);
+	glm::vec3 pPos = glm::vec3(613.818787, -61.468536, 777.569641);
+	glm::vec3 dir = glm::normalize(pTarget - pPos);
+
+	Engine::LogInfo(glm::to_string(pTarget + dir * 90.f));
+
 	GameObject * portalGO = GameObject::Instantiate("portal");
-	portalGO->GetTransform()->SetLocalScale(glm::vec3(10.f, 50.f, 30.f));
-	portalGO->GetTransform()->SetLocalPosition(glm::vec3(712.f, -90.f, 512.f));
+	portalGO->GetTransform()->SetLocalScale(glm::vec3(5.f, 30.f, 12.f));
+	portalGO->GetTransform()->SetLocalPosition(pTarget + dir * 90.f + glm::vec3(0.f, 5.f, 0.f));
+	portalGO->GetTransform()->SetLocalRotation(glm::vec3(0.f, -.607f, 0.f));
 	MeshRenderer * portalRenderer = portalGO->AddComponent<MeshRenderer>();
 	portalRenderer->SetMesh(MeshFactory::BuildCube(true));
 	Material * portalMaterial = new Material("flat");
@@ -51,11 +274,11 @@ void DemoController::Awake()
 	stencilTerrain.pass = GL_KEEP;
 	this->terrain->material->SetFeature(GL_STENCIL_TEST, true);
 	this->terrain->material->SetStencilOperation(stencilTerrain);
-/*
+
 	GameObject * secondaryTerrainGO = GameObject::Instantiate("terrain");
 	Terrain * secondaryTerrain = secondaryTerrainGO->AddComponent<Terrain>();
 	secondaryTerrain->GetTransform()->SetLocalRotation(glm::vec3(glm::radians(180.f), 0.f, 0.f));
-	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(0, -100.f, 1024.f));
+	secondaryTerrain->GetTransform()->SetLocalPosition(glm::vec3(0, -150.f, 1024.f));
 
 	Material::StencilOperation stencilTerrainSecondary;
 	stencilTerrainSecondary.mask = 0x00;
@@ -65,7 +288,6 @@ void DemoController::Awake()
 	stencilTerrainSecondary.pass = GL_KEEP;
 	secondaryTerrain->material->SetFeature(GL_STENCIL_TEST, true);
 	secondaryTerrain->material->SetStencilOperation(stencilTerrainSecondary);
-*/
 
 	GameObject * waterGO = GameObject::Instantiate("water");
 	waterGO->GetTransform()->SetLocalPosition(glm::vec3(625, -90.f, 472));
@@ -97,7 +319,7 @@ void DemoController::Awake()
 	//raymarchedMaterials.push_back(pillarMaterial);
 	raymarchedMaterials.push_back(terrain->material);
 	raymarchedMaterials.push_back(waterMaterial);
-	//raymarchedMaterials.push_back(secondaryTerrain->material);
+	raymarchedMaterials.push_back(secondaryTerrain->material);
 
 	ShaderPassComposer * composer = new ShaderPassComposer();
 	composer->SetSourceTarget(raymarchingTarget);
@@ -117,6 +339,23 @@ void DemoController::Awake()
 
 	//mainQuadMaterial->SetTexture("Heightfield", heightmap);
 	//mainQuadMaterial->SetTexture("FeedbackBuffer", feedbackBuffer);
+
+
+	DemoContext context;
+	context.firstTerrain = terrain;
+	context.water = waterGO;
+	context.waterMaterial = waterMaterial;
+	context.portal = portalGO;
+	context.portalMaterial = portalMaterial;
+	context.secondTerrain = secondaryTerrain;
+
+	this->cameraController->AddCameraShot(new IntroCamera(12.5f, this->cameraController->camera, context));
+	this->cameraController->AddCameraShot(new TeleCamera(4.65f, this->cameraController->camera, context));
+	this->cameraController->AddCameraShot(new TeleCameraPrePortal(8.65f, this->cameraController->camera, context));
+	this->cameraController->AddCameraShot(new PortalCamera(17.f, this->cameraController->camera, context));
+	this->cameraController->AddCameraShot(new UnderworldCamera(20.f, this->cameraController->camera, context));
+	
+
 	
 	// Shade
 	ShaderPass * shadingPass = new ShaderPass("pass_passthrough");
@@ -127,8 +366,6 @@ void DemoController::Awake()
 
 void DemoController::Start()
 {
-	//if (music.openFromFile("resources/music.ogg"))
-	//	music.play();
 }
 
 void DemoController::Update()

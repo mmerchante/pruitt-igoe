@@ -31,11 +31,11 @@ int main()
 	sf::Window * window = new sf::Window(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height, 32), 
 										"pruitt-igoe", sf::Style::Fullscreen, window_settings);	
 	window->setMouseCursorVisible(false);
-	//window->setVerticalSyncEnabled(true);
+	window->setVerticalSyncEnabled(true);
 	
 	engine->Initialize(window);
 	engine->GetLog()->SetLogLevel(Log::LogLevel::Verbose);
-	engine->SetTargetFramerate(60);
+	//engine->SetTargetFramerate(60);
 
 	GameObject * demo = GameObject::Instantiate("demo");
 	demo->AddComponent<DemoController>();

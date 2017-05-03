@@ -5,7 +5,7 @@
 
 void Terrain::Awake()
 {
-	int heightmapSize = 2048;
+	int heightmapSize = 1024;
 	int approxHeightmapSize = heightmapSize;
 
 	float maxHeight = 210.f;
@@ -36,7 +36,7 @@ void Terrain::Awake()
 	}
 
 	float verticalScale = 1.f;
-	float scale = .75f * .5f;
+	float scale = .75f;// *.25f;
 	
 	Mesh * terrainMesh = GenerateMesh(hpHeightmap, width, height, verticalScale, resolutionDownsampling);
 	this->renderer = this->gameObject->AddComponent<MeshRenderer>();
@@ -49,7 +49,7 @@ void Terrain::Awake()
 	this->material->SetVector("TerrainScale", glm::vec4(1.f / heightmapSize, verticalScale, 1.f / heightmapSize, 0.f));
 	
 	Texture * fpTexture = new Texture();
-	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP, GL_CLAMP));
+	fpTexture->LoadFromRawFP(rawTerrain, heightmapSize, heightmapSize, TextureParameters(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT));
 
 	this->floatingPointHeightmap = fpTexture;
 	this->material->SetTexture("Heightfield", fpTexture);

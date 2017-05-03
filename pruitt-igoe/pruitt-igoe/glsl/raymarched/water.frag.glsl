@@ -18,6 +18,7 @@ uniform sampler2D RandomTexture;
 uniform sampler2D ReflectedHeightfield;
 uniform vec4 TerrainScale; // Scaling in the sdf to prevent transformation errors
 uniform float Time;  
+uniform float WaveTime;
 
 vec3 sceneBackground()
 {
@@ -115,10 +116,13 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	normal += rayDirection * .2;
 
 	float waveCenter = length(point.xz - vec2(650.0, 552));
-	normal.xz += (sin(fractal(point * .2) * 2.4 + waveCenter - Time * 10.0) * .4 - .4) * (1.0 - saturate(waveCenter * .05));
+	
+	float waveIntensity = smoothstep(0.f, .8f, WaveTime) * smoothstep(0.f, 1.f, 1.0 - WaveTime * WaveTime * .07);
+	normal.xzy += waveIntensity * (sin(fractal(point * .2) * 1.65 + waveCenter - WaveTime * 5.0) * .4 - .4) * (1.0 - saturate(waveCenter * .0125));
 
 	vec3 refl = reflect(rayDirection, normalize(normal));
-	refl.y = abs(refl.y) * .85;
+	refl.x += .2;
+	refl.y = abs(refl.y) * .25;
  
 	return reflections(point, normalize(refl), 100.f);
 }
