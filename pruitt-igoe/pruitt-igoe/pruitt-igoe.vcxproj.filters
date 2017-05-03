@@ -224,5 +224,7 @@
     <None Include="glsl\raymarched\water.vert.glsl" />
     <None Include="glsl\terrain\underworld.frag.glsl" />
     <None Include="glsl\terrain\underworld.vert.glsl" />
+    <None Include="glsl\vignette.frag.glsl" />
+    <None Include="glsl\vignette.vert.glsl" />
   </ItemGroup>
 </Project>

@@ -16,6 +16,9 @@ struct DemoContext
 
 	GameObject * portal;
 	Material * portalMaterial;
+
+	Material * vignetteMaterial;
+	DemoCameraController * camController;
 };
 
 class BaseDemoCamera : public CameraShotController
@@ -27,6 +30,41 @@ public:
 	}
 protected:
 	DemoContext context;
+};
+
+class WaitCamera : public BaseDemoCamera
+{
+public:
+	WaitCamera(float duration, PerspectiveCamera * camera, DemoContext context) : BaseDemoCamera(duration, camera, context)
+	{
+	}
+
+	virtual void OnExit()
+	{
+		context.camController->StartMusic();
+	}
+
+	virtual void OnUpdate(float time)
+	{
+		glm::vec3 pos = glm::vec3(705.0, 25, 552);
+		glm::vec3 target = glm::vec3(650.0, -100.f, 552);
+
+		this->camera->GetTransform()->SetLocalPosition(pos);
+		this->camera->GetTransform()->LookAt(target);
+
+		context.vignetteMaterial->SetFloat("Fade", glm::clamp(time * 1.5f, 0.f, 1.f));
+	}
+
+	virtual void OnSetActive()
+	{
+		context.firstTerrain->GetGameObject()->SetEnabled(true);
+		context.firstTerrain->material->SetFeature(GL_STENCIL_TEST, false); // No stencil on this shot
+		context.water->SetEnabled(true);
+		context.portal->SetEnabled(false);
+
+		camera->GetTransform()->SetLocalRotation(glm::vec3());
+
+	}
 };
 
 class IntroCamera : public BaseDemoCamera
@@ -44,7 +82,6 @@ public:
 
 	virtual void OnUpdate(float time)
 	{
-		// TODO: Fade in overlay
 		glm::vec3 pos = glm::vec3(705.0, 25, 552) + glm::vec3(0.f, -20.f, -100.f) * time;
 		glm::vec3 target = glm::vec3(650.0, -100.f, 552) + glm::vec3(0.f, 5.f, -80.f) * glm::smoothstep(0.f, 1.f, time);
 
@@ -201,6 +238,8 @@ public:
 		glm::vec3 dir = glm::normalize(target - pos);
 		pos += dir * 300.f * (time + .2f);
 
+		context.vignetteMaterial->SetFloat("Fade", 1.0f - glm::smoothstep(.8f, 1.f, time));
+
 		this->camera->GetTransform()->SetLocalPosition(pos);
 		this->camera->GetTransform()->LookAt(target);
 	}
@@ -347,6 +386,18 @@ void DemoController::Awake()
 	//mainQuadMaterial->SetTexture("Heightfield", heightmap);
 	//mainQuadMaterial->SetTexture("FeedbackBuffer", feedbackBuffer);
 
+	GameObject * vignetteGO = GameObject::Instantiate("vignette");
+	MeshRenderer *vignetteRenderer = vignetteGO->AddComponent<MeshRenderer>();
+	vignetteRenderer->SetMesh(MeshFactory::BuildQuad());
+
+	Material * vignetteMaterial = new Material("vignette");
+	Texture * vignetteTexture = AssetDatabase::GetInstance()->LoadAsset<Texture>("resources/vignette.png");
+	vignetteMaterial->SetTexture("Texture", vignetteTexture);
+	vignetteMaterial->SetFeature(GL_BLEND, true);
+	vignetteMaterial->SetFeature(GL_DEPTH_TEST, false);
+	vignetteMaterial->SetDepthWrite(false);
+	vignetteMaterial->SetBlendOperation(Material::BlendOperation(GL_DST_COLOR, GL_SRC_COLOR));
+	vignetteRenderer->SetMaterial(vignetteMaterial);
 
 	DemoContext context;
 	context.firstTerrain = terrain;
@@ -355,7 +406,10 @@ void DemoController::Awake()
 	context.portal = portalGO;
 	context.portalMaterial = portalMaterial;
 	context.secondTerrain = secondaryTerrain;
+	context.vignetteMaterial = vignetteMaterial;
+	context.camController = cameraController;
 
+	this->cameraController->AddCameraShot(new WaitCamera(2.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new IntroCamera(12.5f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new TeleCamera(4.65f, this->cameraController->camera, context));
 	this->cameraController->AddCameraShot(new TeleCameraPrePortal(8.65f, this->cameraController->camera, context));

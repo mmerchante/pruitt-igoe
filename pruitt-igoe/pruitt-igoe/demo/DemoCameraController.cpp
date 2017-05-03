@@ -9,6 +9,7 @@ void DemoCameraController::Awake()
 	this->manualMode = true;
 	this->currentTime = 0.f;
 	this->currentShot = -1;
+	this->musicStarted = false;
 
 	// Hacky, but SFML is not very flexible with this...
 	glm::vec2 screenCenter = glm::vec2(Engine::GetScreenSize()) * .5f;
@@ -100,7 +101,7 @@ void DemoCameraController::OnKeyReleaseEvent(sf::Event::KeyEvent * e)
 
 		if (this->manualMode)
 			music.pause();
-		else
+		else if(musicStarted)
 			music.play();
 	}
 
@@ -120,6 +121,12 @@ void DemoCameraController::OnKeyReleaseEvent(sf::Event::KeyEvent * e)
 void DemoCameraController::AddCameraShot(CameraShotController * cam)
 {
 	this->shotControllers.push_back(cam);
+}
+
+void DemoCameraController::StartMusic()
+{
+	music.play();
+	musicStarted = true;
 }
 
 void DemoCameraController::UpdateCurrentShot()

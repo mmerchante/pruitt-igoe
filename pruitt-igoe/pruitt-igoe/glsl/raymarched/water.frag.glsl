@@ -119,7 +119,7 @@ vec3 shade(vec3 point, vec3 normal, vec3 rayOrigin, vec3 rayDirection, float t)
 	normal.xzy += waveIntensity * (sin(fractal(point * .2) * 1.65 + waveCenter - WaveTime * 5.0) * .4 - .4) * (1.0 - saturate(waveCenter * .0125));
 
 	vec3 refl = reflect(rayDirection, normalize(normal));
-	refl.x += .2;
+	refl.x -= .3;
 	refl.y = abs(refl.y) * .25;
  
 	return reflections(point, normalize(refl), 100.f);

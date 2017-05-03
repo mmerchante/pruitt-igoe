@@ -221,6 +221,8 @@
     <None Include="glsl\terrain\terrain_envelope.vert.glsl" />
     <None Include="glsl\ui.frag.glsl" />
     <None Include="glsl\ui.vert.glsl" />
+    <None Include="glsl\vignette.frag.glsl" />
+    <None Include="glsl\vignette.vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

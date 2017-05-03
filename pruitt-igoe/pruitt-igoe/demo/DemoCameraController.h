@@ -30,6 +30,8 @@ public:
 
 	void AddCameraShot(CameraShotController* cam);
 
+	void StartMusic();
+
 	PerspectiveCamera * camera;
 
 private:
@@ -47,5 +49,6 @@ private:
 	std::vector<CameraShotController*> shotControllers;
 	int currentShot;
 	sf::Music music;
+	bool musicStarted;
 };
 
